@@ -59,24 +59,24 @@
 			Rotate270 = DisplayOrientation.DMDO_270
 		}
 		
-		private readonly DEVMODE _nativeMode;
+		internal readonly DEVMODE NativeMode;
 		
 		internal DisplayMode(DEVMODE mode)
 		{
-			_nativeMode = mode;
+			NativeMode = mode;
 		}
 
-		public int Bpp => _nativeMode.dmBitsPerPel;
-		public Size Resolution => new Size(_nativeMode.dmPelsWidth, _nativeMode.dmPelsHeight);
-		public int RefreshRate => _nativeMode.dmDisplayFrequency;
-		public int Ppi => _nativeMode.dmLogPixels;
-		public ScalingType ScalingMode => (ScalingType) _nativeMode.dmDisplayFixedOutput;
-		public Rotation Orientation => (Rotation) _nativeMode.dmDisplayOrientation;
+		public int Bpp => NativeMode.dmBitsPerPel;
+		public Size Resolution => new Size(NativeMode.dmPelsWidth, NativeMode.dmPelsHeight);
+		public int RefreshRate => NativeMode.dmDisplayFrequency;
+		public int Ppi => NativeMode.dmLogPixels;
+		public ScalingType ScalingMode => (ScalingType) NativeMode.dmDisplayFixedOutput;
+		public Rotation Orientation => (Rotation) NativeMode.dmDisplayOrientation;
 		
 		/// <summary>
 		/// Mode is interlaced. Maybe unsupported?
 		/// </summary>
-		public bool Interlaced => _nativeMode.dmDisplayFlags.HasFlag(DisplayFlags.DM_INTERLACED);
+		public bool Interlaced => NativeMode.dmDisplayFlags.HasFlag(DisplayFlags.DM_INTERLACED);
 
 		/// <inheritdoc />
 		public override string ToString() => $"{Resolution.Width}x{Resolution.Height}{(Interlaced ? "i" : "")}@{RefreshRate}Hz ({Bpp}bit)";

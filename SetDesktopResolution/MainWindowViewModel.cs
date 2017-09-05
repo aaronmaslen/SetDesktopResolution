@@ -57,7 +57,8 @@ namespace SetDesktopResolution
 				if(eventArgs.PropertyName != nameof(SelectedDevice)) return;
 
 				SelectedDeviceModes = new ObservableCollection<DisplayMode>(
-					SelectedDevice.Modes.Where(m => m.ScalingMode == DisplayMode.ScalingType.Default)
+					SelectedDevice.Modes.Where(m => m.ScalingMode == DisplayMode.ScalingType.Default
+					                                && m.Bpp == 32)
 					                    .OrderBy(m => m.Resolution.Width)
 					                    .Reverse());
 

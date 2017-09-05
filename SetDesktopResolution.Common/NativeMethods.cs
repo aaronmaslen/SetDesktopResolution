@@ -278,6 +278,9 @@
 		[DllImport("user32.dll")]
 		public static extern DISP_CHANGE ChangeDisplaySettingsEx(string lpszDeviceName, ref DEVMODE lpDevMode, IntPtr hwnd, ChangeDisplaySettingsFlags dwflags, IntPtr lParam);
 
+		public static DISP_CHANGE SetMode(DISPLAY_DEVICE dev, DEVMODE mode) =>
+			ChangeDisplaySettingsEx(dev.DeviceName, ref mode, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_FULLSCREEN, IntPtr.Zero);
+
 		internal static DEVMODE NewDevMode()
 		{
 			var devmode = new DEVMODE

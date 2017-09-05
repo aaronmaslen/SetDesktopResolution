@@ -15,28 +15,27 @@
 
 	public class DisplayDevice : INotifyPropertyChanged
 	{
-		[NotNull]
 		public static IEnumerable<DisplayDevice> GetDisplayDevices() => GetDevices().Select(d => new DisplayDevice(d));
 		
-		private readonly DISPLAY_DEVICE _nativeDevice;
+		internal readonly DISPLAY_DEVICE NativeDevice;
 
 		internal DisplayDevice(DISPLAY_DEVICE device)
 		{
-			_nativeDevice = device;
+			NativeDevice = device;
 
 			UpdateModes();
 		}
 
-		public string DisplayString => _nativeDevice.DeviceString;
-		public string DisplayName => _nativeDevice.DeviceName;
+		public string DisplayString => NativeDevice.DeviceString;
+		public string DisplayName => NativeDevice.DeviceName;
 
 		public void UpdateModes()
 		{
-			Modes = new ObservableCollection<DisplayMode>(GetModes(_nativeDevice).Select(m => new DisplayMode(m)));
+			Modes = new ObservableCollection<DisplayMode>(GetModes(NativeDevice).Select(m => new DisplayMode(m)));
 
 			try
 			{
-				CurrentMode = new DisplayMode(GetCurrentMode(_nativeDevice));
+				CurrentMode = new DisplayMode(GetCurrentMode(NativeDevice));
 			}
 			catch(InvalidDataException)
 			{
@@ -44,9 +43,9 @@
 			}
 		}
 
-		public bool Attached => _nativeDevice.StateFlags.HasFlag(DisplayDeviceStateFlags.AttachedToDesktop);
+		public bool Attached => NativeDevice.StateFlags.HasFlag(DisplayDeviceStateFlags.AttachedToDesktop);
 		
-		public bool DisconnectedOrDisabled => _nativeDevice.StateFlags == 0 || _nativeDevice.StateFlags.HasFlag(DisplayDeviceStateFlags.Disconnect);
+		public bool DisconnectedOrDisabled => NativeDevice.StateFlags == 0 || NativeDevice.StateFlags.HasFlag(DisplayDeviceStateFlags.Disconnect);
 
 		private ObservableCollection<DisplayMode> _modes;
 		public ObservableCollection<DisplayMode> Modes
@@ -74,6 +73,15 @@
 			}
 		}
 
+		public void SetMode(DisplayMode mode)
+		{
+			if(!Modes.Contains(mode))
+				throw new ArgumentException("Unsupported mode requested");
+
+			if(NativeMethods.SetMode(NativeDevice, mode.NativeMode) != DISP_CHANGE.Successful)
+				throw new FormatException("Setting mode failed");
+		}
+
 		/// <inheritdoc />
 		public override string ToString() => $"{DisplayString}{DisplayName}";
 		
@@ -89,10 +97,10 @@
 		{
 			var device = obj as DisplayDevice;
 			return device != null &&
-				   EqualityComparer<DISPLAY_DEVICE>.Default.Equals(_nativeDevice, device._nativeDevice);
+				   EqualityComparer<DISPLAY_DEVICE>.Default.Equals(NativeDevice, device.NativeDevice);
 		}
 
-		public override int GetHashCode() => 416999359 + EqualityComparer<DISPLAY_DEVICE>.Default.GetHashCode(_nativeDevice);
+		public override int GetHashCode() => 416999359 + EqualityComparer<DISPLAY_DEVICE>.Default.GetHashCode(NativeDevice);
 
 		public static bool operator ==(DisplayDevice device1, DisplayDevice device2) => EqualityComparer<DisplayDevice>.Default.Equals(device1, device2);
 		public static bool operator !=(DisplayDevice device1, DisplayDevice device2) => !(device1 == device2);
