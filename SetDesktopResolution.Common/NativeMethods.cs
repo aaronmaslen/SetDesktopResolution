@@ -7,7 +7,7 @@
 	using System.Diagnostics;
 	using System.Diagnostics.CodeAnalysis;
 	using System.IO;
-	using Annotations;
+	using JetBrains.Annotations;
 
 	[SuppressMessage("ReSharper", "EnumUnderlyingTypeIsInt")]
 	internal static class NativeMethods

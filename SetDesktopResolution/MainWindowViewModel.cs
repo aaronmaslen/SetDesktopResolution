@@ -11,9 +11,9 @@ namespace SetDesktopResolution
 {
 	using System.IO;
 	using Common;
-	using Common.Annotations;
 	using System.Diagnostics;
 	using System.Runtime.Remoting.Channels;
+	using JetBrains.Annotations;
 
 	internal class MainWindowViewModel : INotifyPropertyChanged
 	{

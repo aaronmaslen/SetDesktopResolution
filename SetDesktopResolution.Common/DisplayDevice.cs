@@ -10,7 +10,7 @@
 	using System.Runtime.CompilerServices;
 	using System.Text;
 	using System.Threading.Tasks;
-	using Annotations;
+	using JetBrains.Annotations;
 	using static NativeMethods;
 
 	public class DisplayDevice : INotifyPropertyChanged
