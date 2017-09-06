@@ -285,13 +285,6 @@
 		[DllImport("user32.dll")]
 		public static extern DISP_CHANGE ChangeDisplaySettingsEx(string lpszDeviceName, ref DEVMODE lpDevMode, IntPtr hwnd, ChangeDisplaySettingsFlags dwflags, IntPtr lParam);
 
-		public static void SetMode(DISPLAY_DEVICE dev, DEVMODE mode)
-		{
-			var result = ChangeDisplaySettingsEx(dev.DeviceName, ref mode, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_FULLSCREEN, IntPtr.Zero);
-			if (result != DISP_CHANGE.Successful)
-				throw new NativeMethodException($"Setting mode failed: {result} returned", nameof(ChangeDisplaySettingsEx));
-		}
-
 		internal static DEVMODE NewDevMode()
 		{
 			var devmode = new DEVMODE
@@ -320,6 +313,13 @@
 			return dev;
 		}
 
+		public static void SetMode(DISPLAY_DEVICE dev, DEVMODE mode)
+		{
+			var result = ChangeDisplaySettingsEx(dev.DeviceName, ref mode, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_FULLSCREEN, IntPtr.Zero);
+			if (result != DISP_CHANGE.Successful)
+				throw new NativeMethodException($"Setting mode failed: {result} returned", nameof(ChangeDisplaySettingsEx), result, typeof(DISP_CHANGE));
+		}
+		
 		[NotNull]
 		public static IEnumerable<DISPLAY_DEVICE> GetDevices()
 		{
