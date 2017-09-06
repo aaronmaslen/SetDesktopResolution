@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using System.CodeDom;
+using Serilog;
 namespace SetDesktopResolution
 {
 	using System;
@@ -16,7 +17,8 @@ namespace SetDesktopResolution
 	using System.Windows.Navigation;
 	using System.Windows.Shapes;
 	using Microsoft.Win32;
-	using SetDesktopResolution.Common;
+	using Common;
+	using Common.Extensions;
 
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
@@ -45,6 +47,42 @@ namespace SetDesktopResolution
 		private void LogTextBoxScrollToEnd(object sender, DataTransferEventArgs e)
 		{
 			LogTextBox.ScrollToEnd();
+		}
+
+		private void RunButtonClick(object sender, RoutedEventArgs e)
+		{
+			DisableControls(new Control[]
+				                {
+					                DevicesComboBox,
+					                ModesComboBox,
+					                ExecutablePathTextBox,
+					                BrowseButton,
+					                RunButton,
+				                });
+		}
+
+		private readonly ICollection<Control> _disabledControls = new List<Control>();
+		
+		private void DisableControls(IEnumerable<Control> controlsToDisable)
+		{
+			foreach(var c in controlsToDisable)
+			{
+				c.IsEnabled = false;
+
+				if(_disabledControls.Contains(c))
+					continue;
+
+				_disabledControls.Add(c);
+			}
+		}
+
+		private void EnableControls()
+		{
+			foreach(var c in _disabledControls)
+			{
+				c.IsEnabled = true;
+				_disabledControls.Remove(c);
+			}
 		}
 	}
 }

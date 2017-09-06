@@ -70,6 +70,7 @@
 
 				SelectedDeviceModes = new ObservableCollection<DisplayMode>(
 					SelectedDevice.Modes.Where(m => m.ScalingMode == DisplayMode.ScalingType.Default &&
+					                                !m.Interlaced &&
 					                                m.Bpp == 32)
 					                    .OrderBy(m => m.Resolution.Width)
 					                    .Reverse());

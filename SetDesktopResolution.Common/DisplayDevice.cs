@@ -11,6 +11,9 @@
 	using System.Text;
 	using System.Threading.Tasks;
 	using JetBrains.Annotations;
+
+	using Serilog;
+
 	using static NativeMethods;
 
 	public class DisplayDevice : INotifyPropertyChanged
@@ -59,9 +62,11 @@
 				{
 					return new DisplayMode(GetCurrentMode(NativeDevice));
 				}
-				catch (NativeMethodException)
+				catch (NativeMethodException nme)
 				{
-					return null;
+					Log.Logger.Error(nme.ToString());
+
+					throw;
 				}
 			}
 		}
@@ -72,6 +77,8 @@
 				throw new ArgumentException("Unsupported mode requested", nameof(mode));
 
 			NativeMethods.SetMode(NativeDevice, mode.NativeMode);
+			
+			OnPropertyChanged(nameof(CurrentMode));
 		}
 
 		/// <inheritdoc />
@@ -80,10 +87,8 @@
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		[NotifyPropertyChangedInvocator]
-		protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-		{
+		protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) => 
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-		}
 
 		public override bool Equals(object obj)
 		{

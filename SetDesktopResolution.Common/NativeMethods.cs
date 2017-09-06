@@ -340,10 +340,8 @@
 
 				if (!EnumDisplaySettingsEx(device.DeviceName, i, ref devMode, EDS_RAWMODE))
 					yield break;
-
-				//Debug.WriteLine($"  {devMode.dmDeviceName}: {devMode.dmPelsWidth}x{devMode.dmPelsHeight}@{devMode.dmDisplayFrequency}");
 				
-				Log.Logger.Debug("devMode.DeviceName: \"{DeviceName}\", Mode: {Width}x{Height}@@{Frequency}", devMode.dmDeviceName, devMode.dmPelsWidth, devMode.dmPelsHeight, devMode.dmDisplayFrequency);
+				Log.Logger.Debug("DEVMODE.DeviceName: \"{DeviceName}\", Mode: {Width}x{Height} {Frequency}Hz", devMode.dmDeviceName, devMode.dmPelsWidth, devMode.dmPelsHeight, devMode.dmDisplayFrequency);
 
 				yield return devMode;
 			}

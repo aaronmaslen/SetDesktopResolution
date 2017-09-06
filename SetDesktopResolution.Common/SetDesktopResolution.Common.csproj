@@ -52,6 +52,7 @@
     <Compile Include="CustomCommand.cs" />
     <Compile Include="DisplayDevice.cs" />
     <Compile Include="DisplayMode.cs" />
+    <Compile Include="Extensions\CollectionExtensions.cs" />
     <Compile Include="NativeMethodException.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
