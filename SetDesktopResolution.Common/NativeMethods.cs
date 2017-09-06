@@ -9,6 +9,8 @@
 	using System.IO;
 	using JetBrains.Annotations;
 
+	using Serilog;
+
 	[SuppressMessage("ReSharper", "EnumUnderlyingTypeIsInt")]
 	internal static class NativeMethods
 	{
@@ -278,8 +280,12 @@
 		[DllImport("user32.dll")]
 		public static extern DISP_CHANGE ChangeDisplaySettingsEx(string lpszDeviceName, ref DEVMODE lpDevMode, IntPtr hwnd, ChangeDisplaySettingsFlags dwflags, IntPtr lParam);
 
-		public static DISP_CHANGE SetMode(DISPLAY_DEVICE dev, DEVMODE mode) =>
-			ChangeDisplaySettingsEx(dev.DeviceName, ref mode, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_FULLSCREEN, IntPtr.Zero);
+		public static void SetMode(DISPLAY_DEVICE dev, DEVMODE mode)
+		{
+			var result = ChangeDisplaySettingsEx(dev.DeviceName, ref mode, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_FULLSCREEN, IntPtr.Zero);
+			if(result != DISP_CHANGE.Successful)
+				throw new NativeMethodException($"Setting mode failed: {result} returned", nameof(ChangeDisplaySettingsEx));
+		}
 
 		internal static DEVMODE NewDevMode()
 		{
@@ -326,8 +332,8 @@
 		[NotNull]
 		public static IEnumerable<DEVMODE> GetModes(DISPLAY_DEVICE device)
 		{
-			Debug.WriteLine($"{device.DeviceString} {device.DeviceName}");
-
+			Log.Logger.Debug("DeviceString: \"{DeviceString}\", DeviceName: \"{DeviceName}\"", device.DeviceString, device.DeviceName);
+			
 			for(int i = 0;; i++)
 			{
 				var devMode = NewDevMode();
@@ -335,7 +341,9 @@
 				if (!EnumDisplaySettingsEx(device.DeviceName, i, ref devMode, EDS_RAWMODE))
 					yield break;
 
-				Debug.WriteLine($"  {devMode.dmDeviceName}: {devMode.dmPelsWidth}x{devMode.dmPelsHeight}@{devMode.dmDisplayFrequency}");
+				//Debug.WriteLine($"  {devMode.dmDeviceName}: {devMode.dmPelsWidth}x{devMode.dmPelsHeight}@{devMode.dmDisplayFrequency}");
+				
+				Log.Logger.Debug("devMode.DeviceName: \"{DeviceName}\", Mode: {Width}x{Height}@@{Frequency}", devMode.dmDeviceName, devMode.dmPelsWidth, devMode.dmPelsHeight, devMode.dmDisplayFrequency);
 
 				yield return devMode;
 			}
@@ -346,14 +354,16 @@
 			var devMode = NewDevMode();
 
 			if(!EnumDisplaySettingsEx(device.DeviceName, ENUM_CURRENT_SETTINGS, ref devMode, EDS_RAWMODE))
-				throw new InvalidDataException("Unknown error occurred. Display disconnected?");
+				throw new NativeMethodException("Unknown error occurred. Display disconnected?", nameof(EnumDisplaySettingsEx));
 
 			return devMode;
 		}
 
 		public static Dictionary<DISPLAY_DEVICE, ICollection<DEVMODE>> GetAllModes()
 		{
-			return GetDevices().ToDictionary<DISPLAY_DEVICE, DISPLAY_DEVICE, ICollection<DEVMODE>>(device => device, device => GetModes(device).ToList());
+			return GetDevices().ToDictionary<DISPLAY_DEVICE, DISPLAY_DEVICE, ICollection<DEVMODE>>(
+				device => device,
+				device => GetModes(device).ToList());
 		}
 	}
 }

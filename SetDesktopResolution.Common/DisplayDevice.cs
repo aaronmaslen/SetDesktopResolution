@@ -32,15 +32,6 @@
 		public void UpdateModes()
 		{
 			Modes = new ObservableCollection<DisplayMode>(GetModes(NativeDevice).Select(m => new DisplayMode(m)));
-
-			try
-			{
-				CurrentMode = new DisplayMode(GetCurrentMode(NativeDevice));
-			}
-			catch(InvalidDataException)
-			{
-				CurrentMode = null;
-			}
 		}
 
 		public bool Attached => NativeDevice.StateFlags.HasFlag(DisplayDeviceStateFlags.AttachedToDesktop);
@@ -59,27 +50,28 @@
 				OnPropertyChanged();
 			}
 		}
-
-		private DisplayMode _currentMode;
+		
 		public DisplayMode CurrentMode
 		{
-			get => _currentMode;
-			private set
+			get
 			{
-				if(ReferenceEquals(_currentMode, value)) return;
-				
-				_currentMode = value;
-				OnPropertyChanged();
+				try
+				{
+					return new DisplayMode(GetCurrentMode(NativeDevice));
+				}
+				catch (NativeMethodException)
+				{
+					return null;
+				}
 			}
 		}
 
 		public void SetMode(DisplayMode mode)
 		{
 			if(!Modes.Contains(mode))
-				throw new ArgumentException("Unsupported mode requested");
+				throw new ArgumentException("Unsupported mode requested", nameof(mode));
 
-			if(NativeMethods.SetMode(NativeDevice, mode.NativeMode) != DISP_CHANGE.Successful)
-				throw new FormatException("Setting mode failed");
+			NativeMethods.SetMode(NativeDevice, mode.NativeMode);
 		}
 
 		/// <inheritdoc />

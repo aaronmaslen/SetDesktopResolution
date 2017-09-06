@@ -1,4 +1,5 @@
-﻿namespace SetDesktopResolution
+﻿using Serilog;
+namespace SetDesktopResolution
 {
 	using System;
 	using System.Collections.Generic;
@@ -22,14 +23,13 @@
 	/// </summary>
 	/// <inheritdoc cref="Window" />
 	public partial class MainWindow : Window
-	{
-
+	{	
 		public MainWindow()
 		{
 			InitializeComponent();
 		}
-		
-		private void ButtonClick(object sender, RoutedEventArgs e)
+
+		private void BrowseButtonClick(object sender, RoutedEventArgs e)
 		{
 			var openDialog = new OpenFileDialog
 			{
@@ -40,6 +40,11 @@
 				return;
 
 			ExecutablePathTextBox.Text = openDialog.FileName;
+		}
+
+		private void LogTextBoxScrollToEnd(object sender, DataTransferEventArgs e)
+		{
+			LogTextBox.ScrollToEnd();
 		}
 	}
 }

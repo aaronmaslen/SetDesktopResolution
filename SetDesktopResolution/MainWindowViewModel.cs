@@ -1,28 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-
-namespace SetDesktopResolution
+﻿namespace SetDesktopResolution
 {
-	using System.IO;
+	using System;
+	using System.Collections.Generic;
 	using Common;
-	using System.Diagnostics;
-	using System.Runtime.Remoting.Channels;
 	using JetBrains.Annotations;
+	using System.Collections.ObjectModel;
+	using System.ComponentModel;
+	using System.Linq;
+	using System.Reactive.Linq;
+	using System.Runtime.CompilerServices;
+	using System.Windows;
+	using System.Windows.Input;
+	using Serilog.Events;
+	using Serilog;
 
 	internal class MainWindowViewModel : INotifyPropertyChanged
 	{
 		public MainWindowViewModel()
 		{
 			PropertyChanged += DeviceSelectedHandler;
+
+			var app = (App)Application.Current;
+
+			app.LogEvents
+			   .Do(e =>
+				{
+					_logEntries.Add(e);
+
+					OnPropertyChanged(nameof(LogText));
+				})
+			   .Subscribe();
 			
 			Update();
 		}
+
+		private readonly List<LogEvent> _logEntries = new List<LogEvent>();
 
 		public void Update()
 		{
@@ -57,8 +69,8 @@ namespace SetDesktopResolution
 				if(eventArgs.PropertyName != nameof(SelectedDevice)) return;
 
 				SelectedDeviceModes = new ObservableCollection<DisplayMode>(
-					SelectedDevice.Modes.Where(m => m.ScalingMode == DisplayMode.ScalingType.Default
-					                                && m.Bpp == 32)
+					SelectedDevice.Modes.Where(m => m.ScalingMode == DisplayMode.ScalingType.Default &&
+					                                m.Bpp == 32)
 					                    .OrderBy(m => m.Resolution.Width)
 					                    .Reverse());
 
@@ -117,6 +129,52 @@ namespace SetDesktopResolution
 			}
 		}
 
+		private DisplayMode _savedMode;
+		private DisplayDevice _savedDevice;
+		public ICommand RunCommand => new CustomCommand<DisplayMode>(
+			m =>
+				{
+					_savedDevice = SelectedDevice;
+					_savedMode = SelectedDevice.CurrentMode;
+					Log.Logger.Information("Saving current mode {mode}", _savedMode);
+					
+					Log.Logger.Information("Setting mode {mode} on device {device}", m, SelectedDevice);
+					try
+					{
+						SelectedDevice.SetMode(m);
+					}
+					catch(ArgumentException ae)
+					{
+						Log.Error(ae.ToString());
+					}
+					catch(NativeMethodException nme)
+					{
+						Log.Error(nme.ToString());
+					}
+				});
+		
+		public ICommand RestoreCommand => new CustomCommand(
+			() =>
+				{
+					Log.Logger.Information("Restoring saved mode {mode} on device {device}", _savedMode, _savedDevice);
+					try
+					{
+						_savedDevice.SetMode(_savedMode);
+					}
+					catch (ArgumentException ae)
+					{
+						Log.Error(ae.ToString());
+					}
+					catch (NativeMethodException nme)
+					{
+						Log.Error(nme.ToString());
+					}
+				});
+		
+		public string LogText => _logEntries.Where(e => e.Level >= LogEventLevel.Debug)
+		                                .Select(e => $"[{e.Timestamp:HH:mm:ss} {e.Level.ToString().ToUpper()}] {e.RenderMessage()}")
+		                                .Aggregate("", (acc, curr) => acc + Environment.NewLine + curr);
+		
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		[NotifyPropertyChangedInvocator]
