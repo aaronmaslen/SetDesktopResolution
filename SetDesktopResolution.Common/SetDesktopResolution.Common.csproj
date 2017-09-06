@@ -49,7 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CustomCommand.cs" />
+    <Compile Include="Windows\CustomCommand.cs" />
     <Compile Include="DisplayDevice.cs" />
     <Compile Include="DisplayMode.cs" />
     <Compile Include="Extensions\CollectionExtensions.cs" />
