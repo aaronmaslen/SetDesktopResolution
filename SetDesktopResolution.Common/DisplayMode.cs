@@ -26,8 +26,7 @@
 
 			public override bool Equals(object obj)
 			{
-				var size = obj as Size;
-				return size != null &&
+				return obj is Size size &&
 					   Width == size.Width &&
 					   Height == size.Height;
 			}

@@ -1,7 +1,6 @@
-﻿namespace SetDesktopResolution.Common
+﻿namespace SetDesktopResolution.Common.Windows
 {
 	using System;
-	using System.Linq;
 	using System.Windows.Input;
 
 	public class CustomCommand : CustomCommand<object>
@@ -11,15 +10,15 @@
 		{
 		}
 
-		public void Execute() => Execute(null);
+		public void Execute() => this.Execute(null);
 	}
 
 	public class CustomCommand<T> : ICommand
 	{
 		public CustomCommand(Action<T> command, bool canExecute = true)
 		{
-			CommandAction = command;
-			CanExecuteValue = canExecute;
+			this.CommandAction = command;
+			this.CanExecuteValue = canExecute;
 		}
 		
 		protected Action<T> CommandAction { get; set; }
@@ -27,20 +26,20 @@
 		protected bool CanExecuteValue { get; set; }
 
 		/// <inheritdoc />
-		public virtual bool CanExecute(object parameter) => CanExecuteValue;
+		public virtual bool CanExecute(object parameter) => this.CanExecuteValue;
 
 		/// <inheritdoc />
 		public void Execute(object parameter)
 		{
 			if (!(parameter is T o)) throw new ArgumentException("Invalid parameter type");
 				
-			Execute(o);
+			this.Execute(o);
 		}
 
-		public void Execute(T parameter) => CommandAction?.Invoke(parameter);
+		public void Execute(T parameter) => this.CommandAction?.Invoke(parameter);
 
 		public event EventHandler CanExecuteChanged;
 
-		protected void OnCanExecuteChanged(object sender, EventArgs e) => CanExecuteChanged?.Invoke(sender, e);
+		protected void OnCanExecuteChanged(object sender, EventArgs e) => this.CanExecuteChanged?.Invoke(sender, e);
 	}
 }

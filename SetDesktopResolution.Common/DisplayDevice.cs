@@ -25,35 +25,17 @@
 		internal DisplayDevice(DISPLAY_DEVICE device)
 		{
 			NativeDevice = device;
-
-			UpdateModes();
 		}
 
 		public string DisplayString => NativeDevice.DeviceString;
 		public string DisplayName => NativeDevice.DeviceName;
 
-		public void UpdateModes()
-		{
-			Modes = new ObservableCollection<DisplayMode>(GetModes(NativeDevice).Select(m => new DisplayMode(m)));
-		}
-
 		public bool Attached => NativeDevice.StateFlags.HasFlag(DisplayDeviceStateFlags.AttachedToDesktop);
 		
 		public bool DisconnectedOrDisabled => NativeDevice.StateFlags == 0 || NativeDevice.StateFlags.HasFlag(DisplayDeviceStateFlags.Disconnect);
-
-		private ObservableCollection<DisplayMode> _modes;
-		public ObservableCollection<DisplayMode> Modes
-		{
-			get => _modes;
-			set
-			{
-				if (_modes == value) return;
-						
-				_modes = value;
-				OnPropertyChanged();
-			}
-		}
 		
+		public IEnumerable<DisplayMode> Modes => GetModes(NativeDevice).Select(m => new DisplayMode(m));
+
 		public DisplayMode CurrentMode
 		{
 			get
@@ -92,8 +74,7 @@
 
 		public override bool Equals(object obj)
 		{
-			var device = obj as DisplayDevice;
-			return device != null &&
+			return obj is DisplayDevice device &&
 				   EqualityComparer<DISPLAY_DEVICE>.Default.Equals(NativeDevice, device.NativeDevice);
 		}
 

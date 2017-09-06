@@ -17,6 +17,8 @@
 	using Serilog;
 	using Serilog.Events;
 
+	using SetDesktopResolution.Common.Windows;
+
 	internal class MainWindowViewModel : INotifyPropertyChanged
 	{
 		public MainWindowViewModel()

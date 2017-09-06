@@ -15,8 +15,8 @@
 	[SuppressMessage("ReSharper", "EnumUnderlyingTypeIsInt")]
 	internal static class NativeMethods
 	{
-		[Flags]
 		[SuppressMessage("ReSharper", "InconsistentNaming")]
+		[Flags]
 		public enum DisplayDeviceStateFlags : int
 		{
 			/// <summary>The device is part of the desktop.</summary>
@@ -41,8 +41,8 @@
 			Disconnect = 0x2000000
 		}
 
-		[Flags]
 		[SuppressMessage("ReSharper", "InconsistentNaming")]
+		[Flags]
 		public enum DisplayFlags : int
 		{
 			DM_GRAYSCALE = 0x1,
@@ -65,10 +65,10 @@
 			DMDO_180 = 2,
 			DMDO_270 = 3
 		}
-		
 
-		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+
 		[SuppressMessage("ReSharper", "InconsistentNaming")]
+		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
 		public struct DISPLAY_DEVICE
 		{
 			[MarshalAs(UnmanagedType.U4)]
@@ -118,8 +118,8 @@
 			public static bool operator !=(DISPLAY_DEVICE dEVICE1, DISPLAY_DEVICE dEVICE2) => !(dEVICE1 == dEVICE2);
 		}
 
-		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
 		[SuppressMessage("ReSharper", "InconsistentNaming")]
+		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
 		public struct DEVMODE
 		{
 			[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
@@ -239,8 +239,8 @@
 			public static bool operator !=(DEVMODE mode1, DEVMODE mode2) => !(mode1 == mode2);
 		}
 
-		[Flags]
 		[SuppressMessage("ReSharper", "InconsistentNaming")]
+		[Flags]
 		public enum ChangeDisplaySettingsFlags : uint
 		{
 			CDS_NONE = 0,
