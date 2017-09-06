@@ -17,8 +17,8 @@
 	{
 		public CustomCommand(Action<T> command, bool canExecute = true)
 		{
-			this.CommandAction = command;
-			this.CanExecuteValue = canExecute;
+			CommandAction = command;
+			CanExecuteValue = canExecute;
 		}
 		
 		protected Action<T> CommandAction { get; set; }
@@ -33,7 +33,7 @@
 		{
 			if (!(parameter is T o)) throw new ArgumentException("Invalid parameter type");
 				
-			this.Execute(o);
+			Execute(o);
 		}
 
 		public void Execute(T parameter) => this.CommandAction?.Invoke(parameter);

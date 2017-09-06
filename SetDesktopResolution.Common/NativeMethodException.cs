@@ -7,6 +7,7 @@
 		public string NativeMethodName { get; }
 
 		internal object ExceptionData { get; }
+		
 		internal Type ExceptionDataType { get; }
 		
 		internal NativeMethodException(string message, Exception innerException, string nativeMethodName)
@@ -28,12 +29,12 @@
 			ExceptionDataType = t;
 		}
 
-		internal NativeMethodException(string message, Exception innerException, string nativeMethodName, object o, Type t)
+		internal NativeMethodException(
+			string message, Exception innerException, string nativeMethodName, object o, Type t)
 			: this(message, innerException, nativeMethodName)
 		{
 			ExceptionData = o;
 			ExceptionDataType = t;
 		}
 	}
-
 }

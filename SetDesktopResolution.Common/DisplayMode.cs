@@ -22,6 +22,7 @@
 			}
 			
 			public int Width { get; }
+			
 			public int Height { get; }
 
 			public override bool Equals(object obj)
@@ -39,7 +40,9 @@
 				return hashCode;
 			}
 
-			public static bool operator ==(Size size1, Size size2) => EqualityComparer<Size>.Default.Equals(size1, size2);
+			public static bool operator ==(Size size1, Size size2) =>
+				EqualityComparer<Size>.Default.Equals(size1, size2);
+			
 			public static bool operator !=(Size size1, Size size2) => !(size1 == size2);
 		}
 		
@@ -66,10 +69,15 @@
 		}
 
 		public int Bpp => NativeMode.dmBitsPerPel;
+		
 		public Size Resolution => new Size(NativeMode.dmPelsWidth, NativeMode.dmPelsHeight);
+		
 		public int RefreshRate => NativeMode.dmDisplayFrequency;
+		
 		public int Ppi => NativeMode.dmLogPixels;
+		
 		public ScalingType ScalingMode => (ScalingType)NativeMode.dmDisplayFixedOutput;
+		
 		public Rotation Orientation => (Rotation)NativeMode.dmDisplayOrientation;
 		
 		/// <summary>
@@ -78,7 +86,8 @@
 		public bool Interlaced => NativeMode.dmDisplayFlags.HasFlag(DisplayFlags.DM_INTERLACED);
 
 		/// <inheritdoc />
-		public override string ToString() => $"{Resolution.Width}x{Resolution.Height}{(Interlaced ? "i" : "")}@{RefreshRate}Hz ({Bpp}bit)";
+		public override string ToString() =>
+			$"{Resolution.Width}x{Resolution.Height}{(Interlaced ? "i" : "")}@{RefreshRate}Hz ({Bpp}bit)";
 
 		public override bool Equals(object obj)
 		{

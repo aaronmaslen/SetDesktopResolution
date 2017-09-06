@@ -115,6 +115,7 @@
 			}
 
 			public static bool operator ==(DISPLAY_DEVICE dEVICE1, DISPLAY_DEVICE dEVICE2) => dEVICE1.Equals(dEVICE2);
+			
 			public static bool operator !=(DISPLAY_DEVICE dEVICE1, DISPLAY_DEVICE dEVICE2) => !(dEVICE1 == dEVICE2);
 		}
 
@@ -236,6 +237,7 @@
 			}
 
 			public static bool operator ==(DEVMODE mode1, DEVMODE mode2) => mode1.Equals(mode2);
+			
 			public static bool operator !=(DEVMODE mode1, DEVMODE mode2) => !(mode1 == mode2);
 		}
 
@@ -277,13 +279,17 @@
 		public const uint EDS_RAWMODE = 2;
 
 		[DllImport("user32.dll")]
-		public static extern bool EnumDisplayDevices(string lpDevice, uint iDevNum, ref DISPLAY_DEVICE lpDisplayDevice, uint dwFlags);
+		public static extern bool EnumDisplayDevices(
+			string lpDevice, uint iDevNum, ref DISPLAY_DEVICE lpDisplayDevice, uint dwFlags);
 
 		[DllImport("user32.dll")]
-		public static extern bool EnumDisplaySettingsEx(string lpszDeviceName, int iModeNum, ref DEVMODE lpDevMode, uint dwFlags);
+		public static extern bool EnumDisplaySettingsEx(
+			string lpszDeviceName, int iModeNum, ref DEVMODE lpDevMode, uint dwFlags);
 
 		[DllImport("user32.dll")]
-		public static extern DISP_CHANGE ChangeDisplaySettingsEx(string lpszDeviceName, ref DEVMODE lpDevMode, IntPtr hwnd, ChangeDisplaySettingsFlags dwflags, IntPtr lParam);
+		public static extern DISP_CHANGE ChangeDisplaySettingsEx(
+			string lpszDeviceName, ref DEVMODE lpDevMode, IntPtr hwnd, ChangeDisplaySettingsFlags dwflags, 
+			IntPtr lParam);
 
 		internal static DEVMODE NewDevMode()
 		{
@@ -315,9 +321,13 @@
 
 		public static void SetMode(DISPLAY_DEVICE dev, DEVMODE mode)
 		{
-			var result = ChangeDisplaySettingsEx(dev.DeviceName, ref mode, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_FULLSCREEN, IntPtr.Zero);
+			var result = ChangeDisplaySettingsEx(
+				dev.DeviceName, ref mode, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_FULLSCREEN, IntPtr.Zero);
+			
 			if (result != DISP_CHANGE.Successful)
-				throw new NativeMethodException($"Setting mode failed: {result} returned", nameof(ChangeDisplaySettingsEx), result, typeof(DISP_CHANGE));
+				throw new NativeMethodException(
+					$"Setting mode failed: {result} returned", nameof(ChangeDisplaySettingsEx), result,
+					typeof(DISP_CHANGE));
 		}
 		
 		[NotNull]
@@ -337,7 +347,9 @@
 		[NotNull]
 		public static IEnumerable<DEVMODE> GetModes(DISPLAY_DEVICE device)
 		{
-			Log.Logger.Debug("DeviceString: \"{DeviceString}\", DeviceName: \"{DeviceName}\"", device.DeviceString, device.DeviceName);
+			Log.Logger.Debug(
+				"DeviceString: \"{DeviceString}\", DeviceName: \"{DeviceName}\"",
+				device.DeviceString, device.DeviceName);
 			
 			for (int i = 0;; i++)
 			{
@@ -346,7 +358,9 @@
 				if (!EnumDisplaySettingsEx(device.DeviceName, i, ref devMode, EDS_RAWMODE))
 					yield break;
 				
-				Log.Logger.Debug("DEVMODE.DeviceName: \"{DeviceName}\", Mode: {Width}x{Height} {Frequency}Hz", devMode.dmDeviceName, devMode.dmPelsWidth, devMode.dmPelsHeight, devMode.dmDisplayFrequency);
+				Log.Logger.Debug(
+					"DEVMODE.DeviceName: \"{DeviceName}\", Mode: {Width}x{Height} {Frequency}Hz",
+					devMode.dmDeviceName, devMode.dmPelsWidth, devMode.dmPelsHeight, devMode.dmDisplayFrequency);
 
 				yield return devMode;
 			}
@@ -357,16 +371,14 @@
 			var devMode = NewDevMode();
 
 			if (!EnumDisplaySettingsEx(device.DeviceName, ENUM_CURRENT_SETTINGS, ref devMode, EDS_RAWMODE))
-				throw new NativeMethodException("Unknown error occurred. Display disconnected?", nameof(EnumDisplaySettingsEx));
+				throw new NativeMethodException(
+					"Unknown error occurred. Display disconnected?", nameof(EnumDisplaySettingsEx));
 
 			return devMode;
 		}
 
-		public static Dictionary<DISPLAY_DEVICE, ICollection<DEVMODE>> GetAllModes()
-		{
-			return GetDevices().ToDictionary<DISPLAY_DEVICE, DISPLAY_DEVICE, ICollection<DEVMODE>>(
-				device => device,
-				device => GetModes(device).ToList());
-		}
+		public static Dictionary<DISPLAY_DEVICE, ICollection<DEVMODE>> GetAllModes() => 
+			GetDevices().ToDictionary<DISPLAY_DEVICE, DISPLAY_DEVICE, ICollection<DEVMODE>>(
+				device => device, device => GetModes(device).ToList());
 	}
 }

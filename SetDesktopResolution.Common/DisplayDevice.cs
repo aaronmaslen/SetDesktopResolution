@@ -28,11 +28,13 @@
 		}
 
 		public string DisplayString => NativeDevice.DeviceString;
+		
 		public string DisplayName => NativeDevice.DeviceName;
 
 		public bool Attached => NativeDevice.StateFlags.HasFlag(DisplayDeviceStateFlags.AttachedToDesktop);
 		
-		public bool DisconnectedOrDisabled => NativeDevice.StateFlags == 0 || NativeDevice.StateFlags.HasFlag(DisplayDeviceStateFlags.Disconnect);
+		public bool DisconnectedOrDisabled => 
+			NativeDevice.StateFlags == 0 || NativeDevice.StateFlags.HasFlag(DisplayDeviceStateFlags.Disconnect);
 		
 		public IEnumerable<DisplayMode> Modes => GetModes(NativeDevice).Select(m => new DisplayMode(m));
 
@@ -78,9 +80,12 @@
 				   EqualityComparer<DISPLAY_DEVICE>.Default.Equals(NativeDevice, device.NativeDevice);
 		}
 
-		public override int GetHashCode() => 416999359 + EqualityComparer<DISPLAY_DEVICE>.Default.GetHashCode(NativeDevice);
+		public override int GetHashCode() => 
+			416999359 + EqualityComparer<DISPLAY_DEVICE>.Default.GetHashCode(NativeDevice);
 
-		public static bool operator ==(DisplayDevice device1, DisplayDevice device2) => EqualityComparer<DisplayDevice>.Default.Equals(device1, device2);
+		public static bool operator ==(DisplayDevice device1, DisplayDevice device2) => 
+			EqualityComparer<DisplayDevice>.Default.Equals(device1, device2);
+		
 		public static bool operator !=(DisplayDevice device1, DisplayDevice device2) => !(device1 == device2);
 	}
 }

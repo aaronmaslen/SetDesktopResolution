@@ -16,12 +16,7 @@
 	using System.Windows.Navigation;
 	using System.Windows.Shapes;
 
-	using Common;
-	using Common.Extensions;
-
 	using Microsoft.Win32;
-
-	using Serilog;
 
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml

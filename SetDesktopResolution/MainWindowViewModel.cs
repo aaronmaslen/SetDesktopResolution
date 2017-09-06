@@ -46,7 +46,8 @@
 			var device = SelectedDevice;
 			var mode = SelectedMode;
 			
-			Devices = new ObservableCollection<DisplayDevice>(DisplayDevice.GetDisplayDevices().Where(d => d.Attached));
+			Devices = new ObservableCollection<DisplayDevice>(
+				DisplayDevice.GetDisplayDevices().Where(d => d.Attached));
 
 			if (device != null && Devices.Contains(device)) SelectedDevice = device;
 
@@ -55,6 +56,7 @@
 		}
 
 		private DisplayDevice _selectedDevice;
+		
 		public DisplayDevice SelectedDevice
 		{
 			get => _selectedDevice;
@@ -83,6 +85,7 @@
 			};
 
 		private DisplayMode _selectedMode;
+		
 		public DisplayMode SelectedMode
 		{
 			get => _selectedMode;
@@ -96,6 +99,7 @@
 		}
 
 		private ObservableCollection<DisplayDevice> _devices;
+		
 		public ObservableCollection<DisplayDevice> Devices
 		{
 			get => _devices;
@@ -109,6 +113,7 @@
 		}
 
 		private ObservableCollection<DisplayMode> _selectedDeviceModes;
+		
 		public ObservableCollection<DisplayMode> SelectedDeviceModes
 		{
 			get => _selectedDeviceModes;
@@ -122,6 +127,7 @@
 		}
 
 		private string _executablePath;
+		
 		public string ExecutablePath
 		{
 			get => _executablePath;
@@ -136,6 +142,7 @@
 
 		private DisplayMode _savedMode;
 		private DisplayDevice _savedDevice;
+		
 		public ICommand RunCommand => new CustomCommand<DisplayMode>(
 			m =>
 				{
@@ -176,9 +183,10 @@
 					}
 				});
 		
-		public string LogText => _logEntries.Where(e => e.Level >= LogEventLevel.Debug)
-		                                .Select(e => $"[{e.Timestamp:HH:mm:ss} {e.Level.ToString().ToUpper()}] {e.RenderMessage()}")
-		                                .Aggregate(string.Empty, (acc, curr) => acc + Environment.NewLine + curr);
+		public string LogText => 
+			_logEntries.Where(e => e.Level >= LogEventLevel.Debug)
+			           .Select(e => $"[{e.Timestamp:HH:mm:ss} {e.Level.ToString().ToUpper()}] {e.RenderMessage()}")
+			           .Aggregate(string.Empty, (acc, curr) => acc + Environment.NewLine + curr);
 		
 		public event PropertyChangedEventHandler PropertyChanged;
 
