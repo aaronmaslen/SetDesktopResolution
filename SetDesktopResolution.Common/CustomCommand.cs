@@ -32,7 +32,7 @@
 		/// <inheritdoc />
 		public void Execute(object parameter)
 		{
-			if(!(parameter is T o)) throw new ArgumentException("Invalid parameter type");
+			if (!(parameter is T o)) throw new ArgumentException("Invalid parameter type");
 				
 			Execute(o);
 		}

@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-
-namespace SetDesktopResolution
+﻿namespace SetDesktopResolution
 {
-	using Serilog;
-	using Serilog.Events;
+	using System;
+	using System.Collections.Generic;
+	using System.Configuration;
+	using System.Data;
+	using System.Linq;
 	using System.Reactive;
 	using System.Reactive.Linq;
+	using System.Threading.Tasks;
+	using System.Windows;
 
+	using Serilog;
+	using Serilog.Events;
+
+	/// <inheritdoc />
 	/// <summary>
 	/// Interaction logic for App.xaml
 	/// </summary>

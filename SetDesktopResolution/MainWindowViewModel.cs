@@ -2,8 +2,6 @@
 {
 	using System;
 	using System.Collections.Generic;
-	using Common;
-	using JetBrains.Annotations;
 	using System.Collections.ObjectModel;
 	using System.ComponentModel;
 	using System.Linq;
@@ -11,8 +9,13 @@
 	using System.Runtime.CompilerServices;
 	using System.Windows;
 	using System.Windows.Input;
-	using Serilog.Events;
+
+	using Common;
+
+	using JetBrains.Annotations;
+
 	using Serilog;
+	using Serilog.Events;
 
 	internal class MainWindowViewModel : INotifyPropertyChanged
 	{
@@ -43,10 +46,9 @@
 			
 			Devices = new ObservableCollection<DisplayDevice>(DisplayDevice.GetDisplayDevices().Where(d => d.Attached));
 
-			if(device != null && Devices.Contains(device))
-				SelectedDevice = device;
+			if (device != null && Devices.Contains(device)) SelectedDevice = device;
 
-			if(mode!= null && (SelectedDevice?.Modes.Contains(mode) ?? false))
+			if (mode != null && (SelectedDevice?.Modes.Contains(mode) ?? false))
 				SelectedMode = mode;
 		}
 
@@ -56,7 +58,7 @@
 			get => _selectedDevice;
 			set
 			{
-				if(_selectedDevice == value) return;
+				if (_selectedDevice == value) return;
 				
 				_selectedDevice = value;
 				OnPropertyChanged();
@@ -66,7 +68,7 @@
 		private PropertyChangedEventHandler DeviceSelectedHandler =>
 			(sender, eventArgs) =>
 			{
-				if(eventArgs.PropertyName != nameof(SelectedDevice)) return;
+				if (eventArgs.PropertyName != nameof(SelectedDevice)) return;
 
 				SelectedDeviceModes = new ObservableCollection<DisplayMode>(
 					SelectedDevice.Modes.Where(m => m.ScalingMode == DisplayMode.ScalingType.Default &&
@@ -84,7 +86,7 @@
 			get => _selectedMode;
 			set
 			{
-				if(ReferenceEquals(_selectedMode, value)) return;
+				if (ReferenceEquals(_selectedMode, value)) return;
 				
 				_selectedMode = value;
 				OnPropertyChanged();
@@ -97,7 +99,7 @@
 			get => _devices;
 			private set
 			{
-				if(_devices == value) return;
+				if (_devices == value) return;
 				
 				_devices = value;
 				OnPropertyChanged();
@@ -110,7 +112,7 @@
 			get => _selectedDeviceModes;
 			private set
 			{
-				if(_selectedDeviceModes == value) return;
+				if (_selectedDeviceModes == value) return;
 
 				_selectedDeviceModes = value;
 				OnPropertyChanged();
@@ -123,7 +125,7 @@
 			get => _executablePath;
 			set
 			{
-				if(_executablePath == value) return;
+				if (_executablePath == value) return;
 				
 				_executablePath = value;
 				OnPropertyChanged();
@@ -144,11 +146,11 @@
 					{
 						SelectedDevice.SetMode(m);
 					}
-					catch(ArgumentException ae)
+					catch (ArgumentException ae)
 					{
 						Log.Error(ae.ToString());
 					}
-					catch(NativeMethodException nme)
+					catch (NativeMethodException nme)
 					{
 						Log.Error(nme.ToString());
 					}
@@ -174,7 +176,7 @@
 		
 		public string LogText => _logEntries.Where(e => e.Level >= LogEventLevel.Debug)
 		                                .Select(e => $"[{e.Timestamp:HH:mm:ss} {e.Level.ToString().ToUpper()}] {e.RenderMessage()}")
-		                                .Aggregate("", (acc, curr) => acc + Environment.NewLine + curr);
+		                                .Aggregate(string.Empty, (acc, curr) => acc + Environment.NewLine + curr);
 		
 		public event PropertyChangedEventHandler PropertyChanged;
 

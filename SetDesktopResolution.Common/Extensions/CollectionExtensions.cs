@@ -10,7 +10,7 @@ namespace SetDesktopResolution.Common.Extensions
 	{
 		public static void AddAll<T>(this ICollection<T> collection, IEnumerable<T> items)
 		{
-			foreach(var i in items)
+			foreach (var i in items)
 				collection.Add(i);
 		}
 	}

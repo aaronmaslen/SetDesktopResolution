@@ -1,8 +1,7 @@
-﻿using System.CodeDom;
-using Serilog;
-namespace SetDesktopResolution
+﻿namespace SetDesktopResolution
 {
 	using System;
+	using System.CodeDom;
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Text;
@@ -16,9 +15,13 @@ namespace SetDesktopResolution
 	using System.Windows.Media.Imaging;
 	using System.Windows.Navigation;
 	using System.Windows.Shapes;
-	using Microsoft.Win32;
+
 	using Common;
 	using Common.Extensions;
+
+	using Microsoft.Win32;
+
+	using Serilog;
 
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
@@ -38,7 +41,7 @@ namespace SetDesktopResolution
 				Filter = "Executable (.exe)|*.exe"
 			};
 
-			if(!(openDialog.ShowDialog() ?? false))
+			if (!(openDialog.ShowDialog() ?? false))
 				return;
 
 			ExecutablePathTextBox.Text = openDialog.FileName;
@@ -65,11 +68,11 @@ namespace SetDesktopResolution
 		
 		private void DisableControls(IEnumerable<Control> controlsToDisable)
 		{
-			foreach(var c in controlsToDisable)
+			foreach (var c in controlsToDisable)
 			{
 				c.IsEnabled = false;
 
-				if(_disabledControls.Contains(c))
+				if (_disabledControls.Contains(c))
 					continue;
 
 				_disabledControls.Add(c);
@@ -78,7 +81,7 @@ namespace SetDesktopResolution
 
 		private void EnableControls()
 		{
-			foreach(var c in _disabledControls)
+			foreach (var c in _disabledControls)
 			{
 				c.IsEnabled = true;
 				_disabledControls.Remove(c);

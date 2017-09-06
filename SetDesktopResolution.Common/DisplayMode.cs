@@ -70,8 +70,8 @@
 		public Size Resolution => new Size(NativeMode.dmPelsWidth, NativeMode.dmPelsHeight);
 		public int RefreshRate => NativeMode.dmDisplayFrequency;
 		public int Ppi => NativeMode.dmLogPixels;
-		public ScalingType ScalingMode => (ScalingType) NativeMode.dmDisplayFixedOutput;
-		public Rotation Orientation => (Rotation) NativeMode.dmDisplayOrientation;
+		public ScalingType ScalingMode => (ScalingType)NativeMode.dmDisplayFixedOutput;
+		public Rotation Orientation => (Rotation)NativeMode.dmDisplayOrientation;
 		
 		/// <summary>
 		/// Mode is interlaced. Maybe unsupported?

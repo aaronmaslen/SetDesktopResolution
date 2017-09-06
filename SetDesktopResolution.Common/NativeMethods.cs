@@ -2,11 +2,12 @@
 {
 	using System;
 	using System.Collections.Generic;
-	using System.Linq;
-	using System.Runtime.InteropServices;
 	using System.Diagnostics;
 	using System.Diagnostics.CodeAnalysis;
 	using System.IO;
+	using System.Linq;
+	using System.Runtime.InteropServices;
+
 	using JetBrains.Annotations;
 
 	using Serilog;
@@ -21,14 +22,19 @@
 			/// <summary>The device is part of the desktop.</summary>
 			AttachedToDesktop = 0x1,
 			MultiDriver = 0x2,
+			
 			/// <summary>The device is part of the desktop.</summary>
 			PrimaryDevice = 0x4,
+			
 			/// <summary>Represents a pseudo device used to mirror application drawing for remoting or other purposes.</summary>
 			MirroringDriver = 0x8,
+			
 			/// <summary>The device is VGA compatible.</summary>
 			VGACompatible = 0x10,
+			
 			/// <summary>The device is removable; it cannot be the primary display.</summary>
 			Removable = 0x20,
+			
 			/// <summary>The device has more display modes than its output devices support.</summary>
 			ModesPruned = 0x8000000,
 			Remote = 0x4000000,
@@ -49,7 +55,6 @@
 			DMDFO_DEFAULT = 0x0,
 			DMDFO_STRETCH = 0x1,
 			DMDFO_CENTER = 0x2
-			
 		}
 
 		[SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -283,7 +288,7 @@
 		public static void SetMode(DISPLAY_DEVICE dev, DEVMODE mode)
 		{
 			var result = ChangeDisplaySettingsEx(dev.DeviceName, ref mode, IntPtr.Zero, ChangeDisplaySettingsFlags.CDS_FULLSCREEN, IntPtr.Zero);
-			if(result != DISP_CHANGE.Successful)
+			if (result != DISP_CHANGE.Successful)
 				throw new NativeMethodException($"Setting mode failed: {result} returned", nameof(ChangeDisplaySettingsEx));
 		}
 
@@ -318,11 +323,11 @@
 		[NotNull]
 		public static IEnumerable<DISPLAY_DEVICE> GetDevices()
 		{
-			for(uint i = 0; ; i++)
+			for (uint i = 0;; i++)
 			{
 				var dev = NewDisplayDevice();
 
-				if(!EnumDisplayDevices(null, i, ref dev, 1))
+				if (!EnumDisplayDevices(null, i, ref dev, 1))
 					yield break;
 
 				yield return dev;
@@ -334,7 +339,7 @@
 		{
 			Log.Logger.Debug("DeviceString: \"{DeviceString}\", DeviceName: \"{DeviceName}\"", device.DeviceString, device.DeviceName);
 			
-			for(int i = 0;; i++)
+			for (int i = 0;; i++)
 			{
 				var devMode = NewDevMode();
 
@@ -351,7 +356,7 @@
 		{
 			var devMode = NewDevMode();
 
-			if(!EnumDisplaySettingsEx(device.DeviceName, ENUM_CURRENT_SETTINGS, ref devMode, EDS_RAWMODE))
+			if (!EnumDisplaySettingsEx(device.DeviceName, ENUM_CURRENT_SETTINGS, ref devMode, EDS_RAWMODE))
 				throw new NativeMethodException("Unknown error occurred. Display disconnected?", nameof(EnumDisplaySettingsEx));
 
 			return devMode;

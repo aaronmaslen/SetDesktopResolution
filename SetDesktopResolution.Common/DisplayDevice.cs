@@ -73,7 +73,7 @@
 
 		public void SetMode(DisplayMode mode)
 		{
-			if(!Modes.Contains(mode))
+			if (!Modes.Contains(mode))
 				throw new ArgumentException("Unsupported mode requested", nameof(mode));
 
 			NativeMethods.SetMode(NativeDevice, mode.NativeMode);
