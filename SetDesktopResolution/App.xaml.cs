@@ -19,14 +19,11 @@
 	/// </summary>
 	public partial class App : Application
 	{
-		internal IObservable<LogEvent> LogEvents;
-		
 		public App()
 		{
 			var log = new LoggerConfiguration()
 				.MinimumLevel.Verbose()
 				.WriteTo.Debug()
-				.WriteTo.Observers(e => LogEvents = e.AsObservable())
 				.CreateLogger();
 			
 			Log.Logger = log;

@@ -25,16 +25,14 @@
 		{
 			PropertyChanged += DeviceSelectedHandler;
 
-			var app = (App)Application.Current;
+			//app.LogEvents
+			//   .Do(e =>
+			//	{
+			//		_logEntries.Add(e);
 
-			app.LogEvents
-			   .Do(e =>
-				{
-					_logEntries.Add(e);
-
-					OnPropertyChanged(nameof(LogText));
-				})
-			   .Subscribe();
+			//		OnPropertyChanged(nameof(LogText));
+			//	})
+			//   .Subscribe();
 			
 			Update();
 		}
