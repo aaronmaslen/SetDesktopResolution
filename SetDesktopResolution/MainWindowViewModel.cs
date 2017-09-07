@@ -21,19 +21,17 @@
 
 	internal class MainWindowViewModel : INotifyPropertyChanged
 	{
-		public MainWindowViewModel()
+		public MainWindowViewModel(IObservable<LogEvent> logObservable)
 		{
 			PropertyChanged += DeviceSelectedHandler;
 
-			App.LogEvents
-			   .Do(e =>
+			logObservable
+				.Do(e =>
 				{
 					_logEntries.Add(e);
-
 					OnPropertyChanged(nameof(LogText));
 				})
-			   .Subscribe();
-
+				.Subscribe();
 			Update();
 		}
 

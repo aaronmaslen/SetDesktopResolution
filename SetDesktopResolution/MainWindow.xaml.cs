@@ -18,15 +18,18 @@
 
 	using Microsoft.Win32;
 
+	using Serilog;
+
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
 	/// <inheritdoc cref="Window" />
 	public partial class MainWindow : Window
-	{	
-		public MainWindow()
+	{
+		public MainWindow(App app)
 		{
 			InitializeComponent();
+			DataContext = new MainWindowViewModel(app.LogEvents);
 		}
 
 		private void BrowseButtonClick(object sender, RoutedEventArgs e)

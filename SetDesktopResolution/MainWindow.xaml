@@ -5,14 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SetDesktopResolution"
         mc:Ignorable="d"
-        Title="Set Resolution" Height="350" Width="600" SizeToContent="Width">
-  <Window.Resources>
-    <local:MainWindowViewModel x:Key="WindowViewModel"/>
-  </Window.Resources>
+        Title="Set Resolution" Height="350" Width="600">
   <Grid>
-    <Grid.DataContext>
-      <Binding Source="{StaticResource WindowViewModel}"/>
-    </Grid.DataContext>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
       <RowDefinition Height="Auto"/>
