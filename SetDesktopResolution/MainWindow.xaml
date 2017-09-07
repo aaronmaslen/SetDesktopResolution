@@ -63,7 +63,7 @@
     <Label Grid.Column="3"
             Grid.Row="1"
             Margin="2"
-            Content="{Binding Path=Devices/CurrentMode, Mode=OneWay}"/>
+            Content="{Binding Path=SelectedDeviceCurrentMode, Mode=OneWay}"/>
     <Label Grid.Column="0"
             Grid.Row="2"
             Margin="2">

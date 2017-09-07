@@ -25,15 +25,15 @@
 		{
 			PropertyChanged += DeviceSelectedHandler;
 
-			//app.LogEvents
-			//   .Do(e =>
-			//	{
-			//		_logEntries.Add(e);
+			App.LogEvents
+			   .Do(e =>
+				{
+					_logEntries.Add(e);
 
-			//		OnPropertyChanged(nameof(LogText));
-			//	})
-			//   .Subscribe();
-			
+					OnPropertyChanged(nameof(LogText));
+				})
+			   .Subscribe();
+
 			Update();
 		}
 
@@ -52,6 +52,8 @@
 			if (mode != null && (SelectedDevice?.Modes.Contains(mode) ?? false))
 				SelectedMode = mode;
 		}
+
+		public LogEventLevel MinimumLogDisplayLevel { get; set; } = LogEventLevel.Information;
 
 		private DisplayDevice _selectedDevice;
 		
@@ -79,7 +81,7 @@
 					                    .OrderBy(m => m.Resolution.Width)
 					                    .Reverse());
 
-				SelectedMode = SelectedDevice.CurrentMode;
+				SelectedDeviceCurrentMode = SelectedMode = SelectedDevice.CurrentMode;
 			};
 
 		private DisplayMode _selectedMode;
@@ -124,6 +126,20 @@
 			}
 		}
 
+		private DisplayMode _selectedDeviceCurrentMode;
+
+		public DisplayMode SelectedDeviceCurrentMode
+		{
+			get => _selectedDeviceCurrentMode;
+			private set
+			{
+				if (ReferenceEquals(_selectedDeviceCurrentMode, value)) return;
+
+				_selectedDeviceCurrentMode = value;
+				OnPropertyChanged();
+			}
+		}
+
 		private string _executablePath;
 		
 		public string ExecutablePath
@@ -152,14 +168,15 @@
 					try
 					{
 						SelectedDevice.SetMode(m);
+						SelectedDeviceCurrentMode = SelectedDevice.CurrentMode;
 					}
 					catch (ArgumentException ae)
 					{
-						Log.Error(ae.ToString());
+						Log.Logger.Error(ae, "Invalid mode specified");
 					}
 					catch (NativeMethodException nme)
 					{
-						Log.Error(nme.ToString());
+						Log.Logger.Error(nme, "Failed to set mode");
 					}
 				});
 		
@@ -170,19 +187,20 @@
 					try
 					{
 						_savedDevice.SetMode(_savedMode);
+						SelectedDeviceCurrentMode = SelectedDevice.CurrentMode;
 					}
 					catch (ArgumentException ae)
 					{
-						Log.Error(ae.ToString());
+						Log.Logger.Error(ae, "Invalid mode specified");
 					}
 					catch (NativeMethodException nme)
 					{
-						Log.Error(nme.ToString());
+						Log.Logger.Error(nme, "Failed to set mode");
 					}
 				});
 		
 		public string LogText => 
-			_logEntries.Where(e => e.Level >= LogEventLevel.Debug)
+			_logEntries.Where(e => e.Level >= MinimumLogDisplayLevel)
 			           .Select(e => $"[{e.Timestamp:HH:mm:ss} {e.Level.ToString().ToUpper()}] {e.RenderMessage()}")
 			           .Aggregate(string.Empty, (acc, curr) => acc + Environment.NewLine + curr);
 		

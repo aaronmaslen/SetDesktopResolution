@@ -16,7 +16,7 @@
 
 	using static NativeMethods;
 
-	public class DisplayDevice : INotifyPropertyChanged
+	public class DisplayDevice
 	{
 		public static IEnumerable<DisplayDevice> GetDisplayDevices() => GetDevices().Select(d => new DisplayDevice(d));
 		
@@ -61,18 +61,10 @@
 				throw new ArgumentException("Unsupported mode requested", nameof(mode));
 
 			NativeMethods.SetMode(NativeDevice, mode.NativeMode);
-			
-			OnPropertyChanged(nameof(CurrentMode));
 		}
 
 		/// <inheritdoc />
 		public override string ToString() => $"{DisplayString}{DisplayName}";
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-
-		[NotifyPropertyChangedInvocator]
-		protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) => 
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
 		public override bool Equals(object obj)
 		{
