@@ -97,6 +97,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SetDesktopResolution.Common.Wmi\SetDesktopResolution.Common.Wmi.csproj">
+      <Project>{7d2879a9-1af9-4635-b44d-4dca8f15d1f4}</Project>
+      <Name>SetDesktopResolution.Common.Wmi</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SetDesktopResolution.Common\SetDesktopResolution.Common.csproj">
       <Project>{ff0b2301-9544-4b7e-8dd0-927ae146e820}</Project>
       <Name>SetDesktopResolution.Common</Name>

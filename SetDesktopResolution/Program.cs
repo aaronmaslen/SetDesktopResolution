@@ -9,6 +9,8 @@ namespace SetDesktopResolution
 	using Serilog;
 	using Serilog.Events;
 
+	using SetDesktopResolution.Common.Wmi;
+
 	internal static class Program
 	{
 		[STAThread]
@@ -24,7 +26,10 @@ namespace SetDesktopResolution
 
 			Log.Logger = log;
 
-			new App(logObservable).Run();
+			using (Wmi.RegisterProcessEventWatcher())
+			{
+				new App(logObservable).Run();
+			}
 		}
 	}
 }

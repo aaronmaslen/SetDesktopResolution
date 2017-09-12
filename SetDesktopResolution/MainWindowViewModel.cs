@@ -45,10 +45,17 @@
 			Devices = new ObservableCollection<DisplayDevice>(
 				DisplayDevice.GetDisplayDevices().Where(d => d.Attached));
 
-			if (device != null && Devices.Contains(device)) SelectedDevice = device;
+			if (device != null && Devices.Contains(device))
+			{
+				SelectedDevice = device;
 
-			if (mode != null && (SelectedDevice?.Modes.Contains(mode) ?? false))
-				SelectedMode = mode;
+				if (mode != null && device.Modes.Contains(mode))
+					SelectedMode = mode;
+			}
+			else
+			{
+				SelectedDevice = Devices[0];
+			}
 		}
 
 		public LogEventLevel MinimumLogDisplayLevel { get; set; } = LogEventLevel.Information;
@@ -198,7 +205,8 @@
 				});
 		
 		public string LogText => 
-			_logEntries.Where(e => e.Level >= MinimumLogDisplayLevel)
+			_logEntries.ToList()
+			           .Where(e => e.Level >= MinimumLogDisplayLevel)
 			           .Select(e => $"[{e.Timestamp:HH:mm:ss} {e.Level.ToString().ToUpper()}] {e.RenderMessage()}")
 			           .Aggregate(string.Empty, (acc, curr) => acc + Environment.NewLine + curr);
 		
