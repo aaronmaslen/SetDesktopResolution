@@ -11,7 +11,22 @@
 
 	public static class Wmi
 	{
+		private static bool registered;
+
 		public static IDisposable RegisterProcessEventWatcher()
+		{
+			if (registered) throw new InvalidOperationException("Already registered globally for WMI events");
+
+			registered = true;
+
+			return new DisposableAggregate(new[]
+				                               {
+					                               RegisterProcessEventWatcher(OnProcessEvent),
+					                               new DisposedTrigger(() => registered = false)
+				                               });
+		}
+
+		public static IDisposable RegisterProcessEventWatcher(EventHandler<Win32ProcessEventArgs> handler)
 		{
 			var createWatcher = new ManagementEventWatcher
 				                    {
@@ -20,9 +35,8 @@
 					                                              "TargetInstance isa \"Win32_Process\"")
 				                    };
 
-			createWatcher.EventArrived += (s, e) =>
-				new ProcessEventHandler(e, Win32ProcessEventArgs.InstanceEventType.Create)
-					.HandlerMethod(OnProcessEvent)(s);
+			createWatcher.EventArrived += 
+				ProcessEventHandler.HandlerMethod(handler, Win32ProcessEventArgs.InstanceEventType.Create);
 
 			var deleteWatcher = new ManagementEventWatcher
 				                    {
@@ -31,9 +45,8 @@
 					                                              "TargetInstance isa \"Win32_Process\"")
 				                    };
 			
-			deleteWatcher.EventArrived += (s, e) =>
-				new ProcessEventHandler(e, Win32ProcessEventArgs.InstanceEventType.Delete)
-					.HandlerMethod(OnProcessEvent)(s);
+			deleteWatcher.EventArrived += 
+				ProcessEventHandler.HandlerMethod(handler, Win32ProcessEventArgs.InstanceEventType.Delete);
 
 			var modifyWatcher = new ManagementEventWatcher
 				                    {
@@ -42,10 +55,9 @@
 					                                              "TargetInstance isa \"Win32_Process\"")
 				                    };
 			
-			modifyWatcher.EventArrived += (s, e) =>
-				new ProcessEventHandler(e, Win32ProcessEventArgs.InstanceEventType.Modify)
-					.HandlerMethod(OnProcessEvent)(s);
-			
+			modifyWatcher.EventArrived += 
+				ProcessEventHandler.HandlerMethod(handler, Win32ProcessEventArgs.InstanceEventType.Modify);
+
 			createWatcher.Start();
 			deleteWatcher.Start();
 			modifyWatcher.Start();
@@ -55,6 +67,6 @@
 
 		private static void OnProcessEvent(object sender, Win32ProcessEventArgs e) => ProcessEvent?.Invoke(sender, e);
 
-		public static event Action<object, Win32ProcessEventArgs> ProcessEvent;
+		public static event EventHandler<Win32ProcessEventArgs> ProcessEvent;
 	}
 }

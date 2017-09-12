@@ -9,24 +9,18 @@
 
 	using JetBrains.Annotations;
 
-	internal class ProcessEventHandler
+	internal static class ProcessEventHandler
 	{
-		protected ManagementBaseObject TargetInstance { get; }
-		
-		protected Win32ProcessEventArgs.InstanceEventType EventType { get; }
-		
-		public ProcessEventHandler([NotNull] EventArrivedEventArgs e, 
-		                           Win32ProcessEventArgs.InstanceEventType eventType)
-		{
-			if (!(e.NewEvent["TargetInstance"] is ManagementBaseObject targetInstance))
-				throw new ArgumentException("Missing TargetInstance or TargetInstance is not a ManagementBaseObject");
-
-			TargetInstance = targetInstance;
-			EventType = eventType;
-		}
-
-		public Func<Action<object, Win32ProcessEventArgs>, Action<object>> HandlerMethod =>
-			onEvent => sender =>
-				onEvent(sender, new Win32ProcessEventArgs(new Win32Process(TargetInstance), EventType));
+		public static
+			Func<EventHandler<Win32ProcessEventArgs>, Win32ProcessEventArgs.InstanceEventType, 
+				EventArrivedEventHandler> HandlerMethod =>
+					(onEvent, t) => (sender, e) =>
+					{
+						if (!(e.NewEvent["TargetInstance"] is ManagementBaseObject targetInstance))
+							throw new ArgumentException(
+								"Missing TargetInstance or TargetInstance is not a ManagementBaseObject");
+					
+						onEvent(sender, new Win32ProcessEventArgs(new Win32Process(targetInstance), t));
+					};
 	}
 }
