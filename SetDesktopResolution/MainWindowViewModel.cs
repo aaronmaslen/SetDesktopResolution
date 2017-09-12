@@ -19,9 +19,9 @@
 
 	using SetDesktopResolution.Common.Windows;
 
-	internal class MainWindowViewModel : INotifyPropertyChanged
+	public class MainWindowViewModel : INotifyPropertyChanged
 	{
-		public MainWindowViewModel(IObservable<LogEvent> logObservable)
+		internal MainWindowViewModel(IObservable<LogEvent> logObservable)
 		{
 			PropertyChanged += DeviceSelectedHandler;
 

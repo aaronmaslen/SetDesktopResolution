@@ -1,0 +1,124 @@
+﻿<Window x:Class="SetDesktopResolution.OptionsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SetDesktopResolution"
+        mc:Ignorable="d"
+        Title="OptionsDialog" Height="300" Width="500">
+  <Grid x:Name="TopGrid"
+        Margin="2">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="Auto"/>
+      <ColumnDefinition Width="Auto"/>
+      <ColumnDefinition/>
+      <ColumnDefinition Width="Auto"/>
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+    <Label Grid.Column="0"
+           Grid.Row="0"
+           Margin="2">
+      Minimum Log Display Level:
+    </Label>
+    <ComboBox Grid.Column="1"
+              Grid.Row="0"
+              MinWidth="80"
+              Margin="2"/>
+    <GroupBox Grid.Column="0"
+              Grid.ColumnSpan="3"
+              Grid.Row="1"
+              Grid.RowSpan="2"
+              Margin="2">
+      <GroupBox.Header>
+        <CheckBox x:Name="ModeFiltersGroupCheckBox"
+                  Margin="2">
+          Custom Mode filters
+        </CheckBox>
+      </GroupBox.Header>
+      <Grid IsEnabled="{Binding ElementName=ModeFiltersGroupCheckBox, Path=IsChecked}">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="10" MaxWidth="10"/>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="10" MaxWidth="10"/>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition/>
+        </Grid.RowDefinitions>
+        <CheckBox Grid.Column="0"
+                  Grid.ColumnSpan="7"
+                  Grid.Row="0"
+                  Margin="2">
+          32-bit Color only
+        </CheckBox>
+        <CheckBox Grid.Column="0"
+                  Grid.ColumnSpan="3"
+                  Grid.Row="1"
+                  Margin="2">
+          Minimum Refresh Rate
+        </CheckBox>
+        <ComboBox Grid.Column="1"
+                  Grid.Row="2"
+                  Margin="2"/>
+        <CheckBox Grid.Column="3"
+                  Grid.ColumnSpan="3"
+                  Grid.Row="1"
+                  Margin="2">
+          Maximum Refresh Rate
+        </CheckBox>
+        <ComboBox Grid.Column="4"
+                  Grid.Row="2"
+                  Margin="2"/>
+      </Grid>
+    </GroupBox>
+    <Grid Grid.Column="3"
+          Grid.Row="0"
+          Grid.RowSpan="3">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition/>
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="10" MaxWidth="10"/>
+        <ColumnDefinition/>
+      </Grid.ColumnDefinitions>
+      <Label Grid.Row="0"
+             Grid.Column="0"
+             Grid.ColumnSpan="2"
+             Margin="2">
+        Process Monitor Mode:
+      </Label>
+      <RadioButton Grid.Row="1"
+                   Grid.Column="1"
+                   Margin="2"
+                   GroupName="ProcessMonitorMode">
+        Single Process
+      </RadioButton>
+      <RadioButton Grid.Row="2"
+                   Grid.Column="1"
+                   Margin="2"
+                   GroupName="ProcessMonitorMode">
+        Process + Children
+      </RadioButton>
+      <RadioButton Grid.Row="3"
+                   Grid.Column="1"
+                   Margin="2"
+                   GroupName="ProcessMonitorMode">
+        Running Process Detection
+      </RadioButton>
+    </Grid>
+  </Grid>
+</Window>

@@ -3,7 +3,9 @@
 	using System;
 	using System.CodeDom;
 	using System.Collections.Generic;
+	using System.ComponentModel;
 	using System.Linq;
+	using System.Runtime.CompilerServices;
 	using System.Text;
 	using System.Threading.Tasks;
 	using System.Windows;
@@ -16,6 +18,8 @@
 	using System.Windows.Navigation;
 	using System.Windows.Shapes;
 
+	using JetBrains.Annotations;
+
 	using Microsoft.Win32;
 
 	using Serilog;
@@ -24,12 +28,15 @@
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
 	/// <inheritdoc cref="Window" />
-	public partial class MainWindow : Window
+	public partial class MainWindow : Window, INotifyPropertyChanged
 	{
+		public MainWindowViewModel ViewModel { get; }
+		
 		public MainWindow(App app)
 		{
 			InitializeComponent();
-			DataContext = new MainWindowViewModel(app.LogEvents);
+			ViewModel = new MainWindowViewModel(app.LogEvents);
+			OnPropertyChanged(nameof(ViewModel));
 		}
 
 		private void BrowseButtonClick(object sender, RoutedEventArgs e)
@@ -84,6 +91,14 @@
 				c.IsEnabled = true;
 				_disabledControls.Remove(c);
 			}
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		[NotifyPropertyChangedInvocator]
+		protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
 	}
 }
