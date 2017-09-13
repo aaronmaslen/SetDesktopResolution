@@ -10,7 +10,7 @@
 		{
 		}
 
-		public void Execute() => this.Execute(null);
+		public void Execute() => CommandAction?.Invoke(null);
 	}
 
 	public class CustomCommand<T> : ICommand
@@ -31,15 +31,21 @@
 		/// <inheritdoc />
 		public void Execute(object parameter)
 		{
+			if (this is CustomCommand c)
+			{
+				c.Execute();
+				return;
+			}
+
 			if (!(parameter is T o)) throw new ArgumentException("Invalid parameter type");
-				
+
 			Execute(o);
 		}
 
-		public void Execute(T parameter) => this.CommandAction?.Invoke(parameter);
+		public void Execute(T parameter) => CommandAction?.Invoke(parameter);
 
 		public event EventHandler CanExecuteChanged;
 
-		protected void OnCanExecuteChanged(object sender, EventArgs e) => this.CanExecuteChanged?.Invoke(sender, e);
+		protected void OnCanExecuteChanged(object sender, EventArgs e) => CanExecuteChanged?.Invoke(sender, e);
 	}
 }

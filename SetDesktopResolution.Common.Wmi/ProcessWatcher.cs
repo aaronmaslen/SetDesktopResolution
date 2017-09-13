@@ -19,12 +19,12 @@
 
 			public ProcessWatcherEventFlags EventFlags { get; }
             
-			public int Pid { get; }
+			public Win32Process Process { get; }
             
-			internal ProcessWatcherEventArgs(ProcessWatcherEventFlags flags, int pid)
+			internal ProcessWatcherEventArgs(ProcessWatcherEventFlags flags, Win32Process process)
 			{
 				EventFlags = flags;
-				Pid = pid;
+				Process = process;
 			}
 		}
         
@@ -33,29 +33,43 @@
 		private readonly string _args;
 
 		private Process _process;
-        
-		public ProcessWatcher(string executablePath, string args)
+		
+		public ProcessDetectionMode Mode { get; }
+		
+		public ProcessWatcher(string executablePath, string args, ProcessDetectionMode mode)
 		{
 			_path = executablePath;
 			_args = args;
+			Mode = mode;
 		}
 
 		public void Start()
 		{
 			if (_disposed)
 				throw new ObjectDisposedException(nameof(ProcessWatcher));
-			
-			_process = Process.Start(_path, _args);
-			
-			_pidsToWatch.Add(Pid);
+
+			if (Mode != ProcessDetectionMode.RunningProcess)
+			{
+				_process = Process.Start(_path, _args);
+
+				Pid = _process?.Id ?? -1;
+				_pidsToWatch.Add(Pid);
+			}
 
 			Wmi.ProcessEvent += WmiEventHandler;
 		}
 
-		private readonly List<int> _pidsToWatch = new List<int>();
+		private readonly List<long> _pidsToWatch = new List<long>();
 		
 		private void WmiEventHandler(object sender, Win32ProcessEventArgs e)
 		{
+			if (Mode == ProcessDetectionMode.RunningProcess &&
+			    e.Process.ExecutablePath == _path)
+			{
+				Pid = e.Process.ProcessId;
+				_pidsToWatch.Add(Pid);
+			}
+
 			if (_pidsToWatch.Contains(e.Process.ProcessId))
 			{
 				switch (e.EventType)
@@ -63,16 +77,19 @@
 					case Win32ProcessEventArgs.InstanceEventType.Create:
 						OnProcessEvent(this, new ProcessWatcherEventArgs(
 							               ProcessWatcherEventArgs.ProcessWatcherEventFlags.Started,
-							               e.Process.ProcessId));
+							               e.Process));
 						break;
 					case Win32ProcessEventArgs.InstanceEventType.Delete:
 						OnProcessEvent(this, new ProcessWatcherEventArgs(
 							               ProcessWatcherEventArgs.ProcessWatcherEventFlags.Stopped, 
-							               e.Process.ProcessId));
+							               e.Process));
+						
+						_pidsToWatch.Remove(e.Process.ProcessId);
 						break;
 				}
 			}
-			else if (_pidsToWatch.Contains(e.Process.ParentProcessId))
+			else if (Mode == ProcessDetectionMode.ProcessPlusChildren && 
+			         _pidsToWatch.Contains(e.Process.ParentProcessId))
 			{
 				_pidsToWatch.Add(e.Process.ProcessId);
 
@@ -82,21 +99,37 @@
 						OnProcessEvent(this, new ProcessWatcherEventArgs(
 							               ProcessWatcherEventArgs.ProcessWatcherEventFlags.Started | 
 							               ProcessWatcherEventArgs.ProcessWatcherEventFlags.Child, 
-							               e.Process.ProcessId));
+							               e.Process));
 						break;
 					case Win32ProcessEventArgs.InstanceEventType.Delete:
 						OnProcessEvent(this, new ProcessWatcherEventArgs(
 							               ProcessWatcherEventArgs.ProcessWatcherEventFlags.Stopped |
 							               ProcessWatcherEventArgs.ProcessWatcherEventFlags.Child,
-							               e.Process.ProcessId));
+							               e.Process));
+						
+						_pidsToWatch.Remove(e.Process.ProcessId);
 						break;
 				}
 			}
+
+			if (_pidsToWatch.Count == 0 && Pid != -1)
+			{
+				Wmi.ProcessEvent -= WmiEventHandler;
+				
+				OnStopEvent(this);
+			}
 		}
-		
-		public int Pid => _process?.Id ?? -1;
+
+		public long Pid { get; private set; } = -1;
 
 		public event EventHandler<ProcessWatcherEventArgs> ProcessEvent;
+
+		private void OnStopEvent(object sender)
+		{
+			StopEvent?.Invoke(sender, new EventArgs());
+		}
+		
+		public event EventHandler StopEvent;
 
 		private void OnProcessEvent(object sender, ProcessWatcherEventArgs e) => ProcessEvent?.Invoke(sender, e);
 

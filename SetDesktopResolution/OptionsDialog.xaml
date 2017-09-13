@@ -4,10 +4,23 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SetDesktopResolution"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:serilogEvents="clr-namespace:Serilog.Events;assembly=serilog"
         mc:Ignorable="d"
-        Title="OptionsDialog" Height="300" Width="500">
-  <Grid x:Name="TopGrid"
-        Margin="2">
+        SizeToContent="WidthAndHeight" ResizeMode="NoResize"
+        Title="Options"
+        DataContext="{DynamicResource Settings}">
+  <Window.Resources>
+    <local:SettingsViewModel x:Key="Settings"/>
+    <ObjectDataProvider MethodName="GetValues"
+                        ObjectType="{x:Type sys:Enum}"
+                        x:Key="LogLevels">
+      <ObjectDataProvider.MethodParameters>
+        <x:Type TypeName="serilogEvents:LogEventLevel"/>
+      </ObjectDataProvider.MethodParameters>
+    </ObjectDataProvider>
+  </Window.Resources>
+  <Grid Margin="2">
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="Auto"/>
       <ColumnDefinition Width="Auto"/>
@@ -17,24 +30,27 @@
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
       <RowDefinition Height="Auto"/>
-      <RowDefinition/>
+      <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
     <Label Grid.Column="0"
-           Grid.Row="0"
+           Grid.Row="1"
            Margin="2">
       Minimum Log Display Level:
     </Label>
     <ComboBox Grid.Column="1"
-              Grid.Row="0"
+              Grid.Row="1"
               MinWidth="80"
-              Margin="2"/>
+              Margin="2"
+              ItemsSource="{Binding Source={StaticResource LogLevels}}"
+              SelectedItem="{Binding Path=MinimumLogDisplayLevel, Mode=TwoWay}"/>
     <GroupBox Grid.Column="0"
               Grid.ColumnSpan="3"
-              Grid.Row="1"
+              Grid.Row="0"
               Margin="2">
       <GroupBox.Header>
         <CheckBox x:Name="ModeFiltersGroupCheckBox"
-                  Margin="2">
+                  Margin="2"
+                  IsChecked="{Binding Path=CustomFilterSettings, Mode=TwoWay}">
           Custom Mode filters
         </CheckBox>
       </GroupBox.Header>
@@ -55,33 +71,61 @@
           <RowDefinition/>
         </Grid.RowDefinitions>
         <CheckBox Grid.Column="0"
-                  Grid.ColumnSpan="7"
+                  Grid.ColumnSpan="3"
                   Grid.Row="0"
-                  Margin="2">
-          32-bit Color only
+                  Margin="2"
+                  IsChecked="{Binding Path=Only32BitColor, Mode=TwoWay}">
+          32-bit Color Only
+        </CheckBox>
+        <CheckBox Grid.Column="3"
+                  Grid.ColumnSpan="3"
+                  Grid.Row="0"
+                  Margin="2"
+                  IsChecked="{Binding Path=IncludeInterlacedModes, Mode=TwoWay}">
+          Include Interlaced
         </CheckBox>
         <CheckBox Grid.Column="0"
                   Grid.ColumnSpan="3"
                   Grid.Row="1"
-                  Margin="2">
+                  Margin="2"
+                  IsChecked="{Binding Path=OverrideMinimumRefreshRate, Mode=TwoWay}"
+                  x:Name="MinRefreshRateCheckBox">
           Minimum Refresh Rate
         </CheckBox>
-        <ComboBox Grid.Column="1"
-                  Grid.Row="2"
-                  Margin="2"/>
+        <TextBox Grid.Column="1"
+                 Grid.Row="2"
+                 VerticalAlignment="Center"
+                 Margin="2"
+                 Text="{Binding Path=MinimumRefreshRate, Mode=TwoWay}"
+                 IsEnabled="{Binding ElementName=MinRefreshRateCheckBox, Path=IsChecked, Mode=OneWay}"/>
+        <Label Grid.Column="2"
+               Grid.Row="2"
+               Margin="2">
+          Hz
+        </Label>
         <CheckBox Grid.Column="3"
                   Grid.ColumnSpan="3"
                   Grid.Row="1"
-                  Margin="2">
+                  Margin="2"
+                  IsChecked="{Binding Path=OverrideMaximumRefreshRate, Mode=TwoWay}"
+                  x:Name="MaxRefreshRateCheckBox">
           Maximum Refresh Rate
         </CheckBox>
-        <ComboBox Grid.Column="4"
-                  Grid.Row="2"
-                  Margin="2"/>
+        <TextBox Grid.Column="4"
+                 Grid.Row="2"
+                 VerticalAlignment="Center"
+                 Margin="2"
+                 Text="{Binding Path=MaximumRefreshRate, Mode=TwoWay}"
+                 IsEnabled="{Binding ElementName=MaxRefreshRateCheckBox, Path=IsChecked, Mode=OneWay}"/>
+        <Label Grid.Column="5"
+               Grid.Row="2"
+               Margin="2">
+          Hz
+        </Label>
       </Grid>
     </GroupBox>
     <Grid Grid.Column="3"
-          Grid.Row="1">
+          Grid.Row="0">
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto"/>
         <RowDefinition Height="Auto"/>
@@ -102,21 +146,40 @@
       <RadioButton Grid.Row="1"
                    Grid.Column="1"
                    Margin="2"
-                   GroupName="ProcessMonitorMode">
+                   GroupName="ProcessMonitorMode"
+                   IsChecked="{Binding Path=SingleProcessMode, Mode=TwoWay}">
         Single Process
       </RadioButton>
       <RadioButton Grid.Row="2"
                    Grid.Column="1"
                    Margin="2"
-                   GroupName="ProcessMonitorMode">
+                   GroupName="ProcessMonitorMode"
+                   IsChecked="{Binding Path=ProcessAndChildrenMode, Mode=TwoWay}">
         Process + Children
       </RadioButton>
       <RadioButton Grid.Row="3"
                    Grid.Column="1"
                    Margin="2"
-                   GroupName="ProcessMonitorMode">
+                   GroupName="ProcessMonitorMode"
+                   IsChecked="{Binding Path=RunningProcessDetectionMode, Mode=TwoWay}">
         Running Process Detection
       </RadioButton>
     </Grid>
+    <StackPanel Grid.Column="0"
+                Grid.ColumnSpan="4"
+                Grid.Row="2"
+                Orientation="Horizontal">
+      <Button Width="60" 
+              Margin="2"
+              Command="{Binding Path=ExitAndSaveCommand}"
+              Click="OkButtonClick">
+        OK
+      </Button>
+      <Button Width="60"
+              Margin="2"
+              Click="CancelButtonOnClick">
+        Cancel
+      </Button>
+    </StackPanel>
   </Grid>
 </Window>

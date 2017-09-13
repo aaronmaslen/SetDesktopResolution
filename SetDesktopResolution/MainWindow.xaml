@@ -37,7 +37,8 @@
               Margin="2"
               ItemsSource="{Binding Path=Devices, Mode=OneWay}"
               IsSynchronizedWithCurrentItem="True"
-              SelectedItem="{Binding Path=SelectedDevice, Mode=TwoWay}"/>
+              SelectedItem="{Binding Path=SelectedDevice, Mode=TwoWay}"
+              IsEnabled="{Binding Path=EnableControls, Mode=OneWay}"/>
     <Label Grid.Column="0" 
            Grid.Row="1"
            Margin="2">
@@ -50,7 +51,8 @@
               HorizontalAlignment="Stretch"
               Margin="2"
               ItemsSource="{Binding Path=SelectedDeviceModes}"
-              SelectedItem="{Binding Path=SelectedMode}"/>
+              SelectedItem="{Binding Path=SelectedMode}"
+              IsEnabled="{Binding Path=EnableControls, Mode=OneWay}"/>
     <Label Grid.Column="3"
            Grid.Row="1"
            Margin="2">
@@ -73,18 +75,21 @@
              Margin="2"
              MaxLines="1"
              VerticalContentAlignment="Center"
-             Text="{Binding Path=ExecutablePath, Mode=TwoWay}"/>
+             Text="{Binding Path=ExecutablePath, Mode=TwoWay}"
+             IsEnabled="{Binding Path=EnableControls, Mode=OneWay}"/>
     <Button x:Name="BrowseButton" 
             Grid.Column="6"
             Grid.Row="2"
             Margin="2"
-            Click="BrowseButtonClick">
+            Click="BrowseButtonClick"
+            IsEnabled="{Binding Path=EnableControls, Mode=OneWay}">
       ...
     </Button>
     <Button Grid.Column="5"
             Grid.Row="0"
             Grid.ColumnSpan="2"
-            Margin="2">
+            Margin="2"
+            Click="ButtonClick">
       Options
     </Button>
     <Button x:Name="RunButton" Grid.Column="0"
@@ -93,7 +98,7 @@
             Margin="2"
             Command="{Binding RunCommand}"
             CommandParameter="{Binding SelectedMode}"
-            Click="RunButtonClick">
+            IsEnabled="{Binding Path=EnableControls, Mode=OneWay}">
       Run
     </Button>
     <TextBox x:Name="LogTextBox"

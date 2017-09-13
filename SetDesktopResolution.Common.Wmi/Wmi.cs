@@ -48,21 +48,21 @@
 			deleteWatcher.EventArrived += 
 				ProcessEventHandler.HandlerMethod(handler, Win32ProcessEventArgs.InstanceEventType.Delete);
 
-			var modifyWatcher = new ManagementEventWatcher
-				                    {
-					                    Query = new WqlEventQuery("__InstanceModificationEvent",
-					                                              TimeSpan.FromSeconds(1),
-					                                              "TargetInstance isa \"Win32_Process\"")
-				                    };
-			
-			modifyWatcher.EventArrived += 
-				ProcessEventHandler.HandlerMethod(handler, Win32ProcessEventArgs.InstanceEventType.Modify);
+			////var modifyWatcher = new ManagementEventWatcher
+			////{
+			////	Query = new WqlEventQuery("__InstanceModificationEvent",
+			////													  TimeSpan.FromSeconds(1),
+			////													  "TargetInstance isa \"Win32_Process\"")
+			////};
+
+			////modifyWatcher.EventArrived +=
+			////	ProcessEventHandler.HandlerMethod(handler, Win32ProcessEventArgs.InstanceEventType.Modify);
 
 			createWatcher.Start();
 			deleteWatcher.Start();
-			modifyWatcher.Start();
+			////modifyWatcher.Start();
 
-			return new DisposableAggregate(new[] { createWatcher, deleteWatcher, modifyWatcher });
+			return new DisposableAggregate(new[] { createWatcher, deleteWatcher, /*modifyWatcher*/ });
 		}
 
 		private static void OnProcessEvent(object sender, Win32ProcessEventArgs e) => ProcessEvent?.Invoke(sender, e);

@@ -49,7 +49,7 @@
 			if (!(openDialog.ShowDialog() ?? false))
 				return;
 
-			ExecutablePathTextBox.Text = openDialog.FileName;
+			ViewModel.ExecutablePath = openDialog.FileName;
 		}
 
 		private void LogTextBoxScrollToEnd(object sender, DataTransferEventArgs e)
@@ -57,48 +57,17 @@
 			LogTextBox.ScrollToEnd();
 		}
 
-		private void RunButtonClick(object sender, RoutedEventArgs e)
-		{
-			DisableControls(new Control[]
-				                {
-					                DevicesComboBox,
-					                ModesComboBox,
-					                ExecutablePathTextBox,
-					                BrowseButton,
-					                RunButton,
-				                });
-		}
-
-		private readonly ICollection<Control> _disabledControls = new List<Control>();
-		
-		private void DisableControls(IEnumerable<Control> controlsToDisable)
-		{
-			foreach (var c in controlsToDisable)
-			{
-				c.IsEnabled = false;
-
-				if (_disabledControls.Contains(c))
-					continue;
-
-				_disabledControls.Add(c);
-			}
-		}
-
-		private void EnableControls()
-		{
-			foreach (var c in _disabledControls)
-			{
-				c.IsEnabled = true;
-				_disabledControls.Remove(c);
-			}
-		}
-
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		[NotifyPropertyChangedInvocator]
-		protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-		{
+		private void OnPropertyChanged([CallerMemberName] string propertyName = null) => 
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+		private void ButtonClick(object sender, RoutedEventArgs e)
+		{
+			new OptionsDialog().ShowDialog();
+
+			ViewModel.Update();
 		}
 	}
 }

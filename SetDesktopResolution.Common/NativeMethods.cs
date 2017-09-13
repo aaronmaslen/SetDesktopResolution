@@ -66,7 +66,6 @@
 			DMDO_270 = 3
 		}
 
-
 		[SuppressMessage("ReSharper", "InconsistentNaming")]
 		[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
 		public struct DISPLAY_DEVICE
@@ -358,7 +357,7 @@
 				if (!EnumDisplaySettingsEx(device.DeviceName, i, ref devMode, EDS_RAWMODE))
 					yield break;
 				
-				Log.Logger.Debug(
+				Log.Logger.Verbose(
 					"DEVMODE.DeviceName: \"{DeviceName}\", Mode: {Width}x{Height} {Frequency}Hz",
 					devMode.dmDeviceName, devMode.dmPelsWidth, devMode.dmPelsHeight, devMode.dmDisplayFrequency);
 
@@ -373,6 +372,10 @@
 			if (!EnumDisplaySettingsEx(device.DeviceName, ENUM_CURRENT_SETTINGS, ref devMode, EDS_RAWMODE))
 				throw new NativeMethodException(
 					"Unknown error occurred. Display disconnected?", nameof(EnumDisplaySettingsEx));
+
+			Log.Logger.Debug(
+				"DEVMODE.DeviceName: \"{DeviceName}\", Mode: {Width}x{Height} {Frequency}Hz",
+				devMode.dmDeviceName, devMode.dmPelsWidth, devMode.dmPelsHeight, devMode.dmDisplayFrequency);
 
 			return devMode;
 		}

@@ -6,13 +6,15 @@
 
 	using Serilog.Events;
 
+	using SetDesktopResolution.Properties;
+
 	public class App : Application
 	{
 		private readonly Subject<LogEvent> _logSubject = new Subject<LogEvent>();
 
 		internal IObservable<LogEvent> LogEvents => _logSubject;
 
-		protected Window StartupWindow;
+		public Window StartupWindow { get; }
 		
 		public App(IObservable<LogEvent> logObservable)
 		{

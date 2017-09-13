@@ -11,10 +11,10 @@ namespace SetDesktopResolution
 
 	using SetDesktopResolution.Common.Wmi;
 
-	internal static class Program
+	public static class Program
 	{
 		[STAThread]
-		private static void Main()
+		internal static int Main()
 		{
 			IObservable<LogEvent> logObservable = null;
 			
@@ -28,7 +28,13 @@ namespace SetDesktopResolution
 
 			using (Wmi.RegisterProcessEventWatcher())
 			{
-				new App(logObservable).Run();
+				Wmi.ProcessEvent += (s, e) =>
+					{
+						if (e.EventType != Win32ProcessEventArgs.InstanceEventType.Modify)
+							Log.Logger.Verbose("{Name} ({PID}) - {Event}", e.Process.Name, e.Process.ProcessId, e.EventType);
+					};
+				
+				return new App(logObservable).Run();
 			}
 		}
 	}

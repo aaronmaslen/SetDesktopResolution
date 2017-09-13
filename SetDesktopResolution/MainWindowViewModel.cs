@@ -4,6 +4,7 @@
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
 	using System.ComponentModel;
+	using System.Diagnostics;
 	using System.Linq;
 	using System.Reactive.Linq;
 	using System.Runtime.CompilerServices;
@@ -18,6 +19,9 @@
 	using Serilog.Events;
 
 	using SetDesktopResolution.Common.Windows;
+	using SetDesktopResolution.Common.Wmi;
+
+	using static SetDesktopResolution.Common.Wmi.ProcessWatcher.ProcessWatcherEventArgs.ProcessWatcherEventFlags;
 
 	public class MainWindowViewModel : INotifyPropertyChanged
 	{
@@ -28,6 +32,9 @@
 			logObservable
 				.Do(e =>
 				{
+					if (_logEntries.Count > Properties.Settings.Default.MaxLogItems)
+						_logEntries.RemoveAt(0);
+					
 					_logEntries.Add(e);
 					OnPropertyChanged(nameof(LogText));
 				})
@@ -80,9 +87,13 @@
 				if (eventArgs.PropertyName != nameof(SelectedDevice)) return;
 
 				SelectedDeviceModes = new ObservableCollection<DisplayMode>(
-					SelectedDevice.Modes.Where(m => m.ScalingMode == DisplayMode.ScalingType.Default &&
-					                                !m.Interlaced &&
-					                                m.Bpp == 32)
+					SelectedDevice.Modes.Where(m => m.ScalingMode == DisplayMode.ScalingType.Default)
+					                    .Where(m => Properties.Settings.Default.IncludeInterlacedModes || !m.Interlaced)
+					                    .Where(m => !Properties.Settings.Default.Only32BitColor || m.Bpp == 32)
+					                    .Where(m => m.RefreshRate >= Properties.Settings.Default.MinimumRefreshRate)
+					                    .Where(m => m.RefreshRate <= (Properties.Settings.Default.MaximumRefreshRate > 0 ?
+						                                                  Properties.Settings.Default.MaximumRefreshRate :
+						                                                  int.MaxValue))
 					                    .OrderBy(m => m.Resolution.Width)
 					                    .Reverse());
 
@@ -183,7 +194,31 @@
 					{
 						Log.Logger.Error(nme, "Failed to set mode");
 					}
+					
+					_watcher = new ProcessWatcher(ExecutablePath, string.Empty, Properties.Settings.Default.ProcessDetectionMode);
+					_watcher.ProcessEvent += (s, e) =>
+						{
+							if (e.EventFlags.HasFlag(Started))
+								Log.Information("{Process} ({PID}) started", e.Process.Name, e.Process.ProcessId);
+							else if (e.EventFlags.HasFlag(Stopped))
+								Log.Information("{Process} ({PID}) stopped", e.Process.Name, e.Process.ProcessId);
+							
+							Log.Debug("{PID} {flags}", e.Process.ProcessId, e.EventFlags);
+						};
+					_watcher.StopEvent += (s, e) =>
+						{
+							Log.Information("All processes stopped");
+							((CustomCommand)RestoreCommand).Execute();
+							
+							_watcher.Dispose();
+						};
+					
+					_watcher.Start();
+
+					EnableControls = false;
 				});
+
+		private ProcessWatcher _watcher;
 		
 		public ICommand RestoreCommand => new CustomCommand(
 			() =>
@@ -202,11 +237,27 @@
 					{
 						Log.Logger.Error(nme, "Failed to set mode");
 					}
+
+					EnableControls = true;
 				});
-		
+
+		private bool _enableControls = true;
+
+		public bool EnableControls
+		{
+			get => _enableControls;
+			private set
+			{
+				if (_enableControls == value) return;
+
+				_enableControls = value;
+				OnPropertyChanged();
+			}
+		}
+
 		public string LogText => 
 			_logEntries.ToList()
-			           .Where(e => e.Level >= MinimumLogDisplayLevel)
+			           .Where(e => e.Level >= Properties.Settings.Default.MinimumLogDisplayLevel)
 			           .Select(e => $"[{e.Timestamp:HH:mm:ss} {e.Level.ToString().ToUpper()}] {e.RenderMessage()}")
 			           .Aggregate(string.Empty, (acc, curr) => acc + Environment.NewLine + curr);
 		

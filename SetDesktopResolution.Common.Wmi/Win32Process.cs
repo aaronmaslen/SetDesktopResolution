@@ -9,11 +9,16 @@
 
 	using JetBrains.Annotations;
 
+	using Serilog;
+
 	public class Win32Process
 	{
 		internal Win32Process([NotNull] ManagementBaseObject targetInstance)
 		{
 			TargetInstance = targetInstance;
+			
+			foreach (var p in Properties)
+				Log.Logger.Verbose("[{TargetInstance}] {Property}: {Value}", TargetInstance, p.Key, p.Value.Value);
 		}
 
 		[NotNull]
@@ -27,9 +32,9 @@
 
 		public string Name => Properties["Name"].Value as string;
 
-		public int ProcessId => Properties["ProcessId"].Value as int? ?? -1;
+		public long ProcessId => (long?)(Properties["ProcessId"].Value as uint?) ?? -1;
 
-		public int ParentProcessId => Properties["ParentProcessId"].Value as int? ?? -1;
+		public long ParentProcessId => (long?)(Properties["ParentProcessId"].Value as uint?) ?? -1;
 
 		public string Status => Properties["Status"].Value as string;
 	}
