@@ -16,8 +16,8 @@
     </Grid.ColumnDefinitions>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
-      <RowDefinition/>
       <RowDefinition Height="Auto"/>
+      <RowDefinition/>
     </Grid.RowDefinitions>
     <Label Grid.Column="0"
            Grid.Row="0"
@@ -31,7 +31,6 @@
     <GroupBox Grid.Column="0"
               Grid.ColumnSpan="3"
               Grid.Row="1"
-              Grid.RowSpan="2"
               Margin="2">
       <GroupBox.Header>
         <CheckBox x:Name="ModeFiltersGroupCheckBox"
@@ -82,8 +81,7 @@
       </Grid>
     </GroupBox>
     <Grid Grid.Column="3"
-          Grid.Row="0"
-          Grid.RowSpan="3">
+          Grid.Row="1">
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto"/>
         <RowDefinition Height="Auto"/>
