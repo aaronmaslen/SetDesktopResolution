@@ -106,17 +106,5 @@ namespace SetDesktopResolution.Properties {
                 this["IncludeInterlacedModes"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("100000")]
-        public long MaxLogItems {
-            get {
-                return ((long)(this["MaxLogItems"]));
-            }
-            set {
-                this["MaxLogItems"] = value;
-            }
-        }
     }
 }

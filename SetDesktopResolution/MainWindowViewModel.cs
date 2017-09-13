@@ -1,6 +1,7 @@
 ﻿namespace SetDesktopResolution
 {
 	using System;
+	using System.Collections.Concurrent;
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
 	using System.ComponentModel;
@@ -32,17 +33,14 @@
 			logObservable
 				.Do(e =>
 				{
-					if (_logEntries.Count > Properties.Settings.Default.MaxLogItems)
-						_logEntries.RemoveAt(0);
-					
-					_logEntries.Add(e);
+					_logEntries = _logEntries.Concat(new[] { e }).ToList();
 					OnPropertyChanged(nameof(LogText));
 				})
 				.Subscribe();
 			Update();
 		}
 
-		private readonly List<LogEvent> _logEntries = new List<LogEvent>();
+		private IReadOnlyList<LogEvent> _logEntries = new List<LogEvent>();
 
 		public void Update()
 		{
@@ -255,12 +253,18 @@
 			}
 		}
 
-		public string LogText => 
-			_logEntries.ToList()
-			           .Where(e => e.Level >= Properties.Settings.Default.MinimumLogDisplayLevel)
-			           .Select(e => $"[{e.Timestamp:HH:mm:ss} {e.Level.ToString().ToUpper()}] {e.RenderMessage()}")
-			           .Aggregate(string.Empty, (acc, curr) => acc + Environment.NewLine + curr);
-		
+		public string LogText
+		{
+			get
+			{
+				var tempList = _logEntries.ToList();
+				return tempList.Where(e => e.Level >= Properties.Settings.Default.MinimumLogDisplayLevel)
+				               .OrderBy(e => e.Timestamp)
+				               .Select(e => $"[{e.Timestamp:HH:mm:ss} {e.Level.ToString().ToUpper()}] {e.RenderMessage()}")
+				               .Aggregate(string.Empty, (acc, curr) => acc + Environment.NewLine + curr);
+			}
+		}
+
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		[NotifyPropertyChangedInvocator]
