@@ -59,7 +59,7 @@
 			Wmi.ProcessEvent += WmiEventHandler;
 		}
 
-		private readonly List<long> _pidsToWatch = new List<long>();
+		private readonly ICollection<long> _pidsToWatch = new HashSet<long>();
 		
 		private void WmiEventHandler(object sender, Win32ProcessEventArgs e)
 		{

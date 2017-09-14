@@ -174,40 +174,27 @@
 		public ICommand RunCommand => new CustomCommand<DisplayMode>(
 			m =>
 				{
-					_savedDevice = SelectedDevice;
-					_savedMode = SelectedDevice.CurrentMode;
-					Log.Logger.Information("Saving current mode {mode}", _savedMode);
-					
-					Log.Logger.Information("Setting mode {mode} on device {device}", m, SelectedDevice);
-					try
-					{
-						SelectedDevice.SetMode(m);
-						SelectedDeviceCurrentMode = SelectedDevice.CurrentMode;
-					}
-					catch (ArgumentException ae)
-					{
-						Log.Logger.Error(ae, "Invalid mode specified");
-					}
-					catch (NativeMethodException nme)
-					{
-						Log.Logger.Error(nme, "Failed to set mode");
-					}
-					
 					_watcher = new ProcessWatcher(ExecutablePath, string.Empty, Properties.Settings.Default.ProcessDetectionMode);
 					_watcher.ProcessEvent += (s, e) =>
 						{
 							if (e.EventFlags.HasFlag(Started))
+							{
 								Log.Information("{Process} ({PID}) started", e.Process.Name, e.Process.ProcessId);
+								Activate(m);
+							}
 							else if (e.EventFlags.HasFlag(Stopped))
+							{
 								Log.Information("{Process} ({PID}) stopped", e.Process.Name, e.Process.ProcessId);
-							
+							}
+
 							Log.Debug("{PID} {flags}", e.Process.ProcessId, e.EventFlags);
 						};
 					_watcher.StopEvent += (s, e) =>
 						{
 							Log.Information("All processes stopped");
-							((CustomCommand)RestoreCommand).Execute();
 							
+							Deactivate();
+
 							_watcher.Dispose();
 						};
 					
@@ -215,29 +202,52 @@
 
 					EnableControls = false;
 				});
-
-		private ProcessWatcher _watcher;
 		
-		public ICommand RestoreCommand => new CustomCommand(
-			() =>
-				{
-					Log.Logger.Information("Restoring saved mode {mode} on device {device}", _savedMode, _savedDevice);
-					try
-					{
-						_savedDevice.SetMode(_savedMode);
-						SelectedDeviceCurrentMode = SelectedDevice.CurrentMode;
-					}
-					catch (ArgumentException ae)
-					{
-						Log.Logger.Error(ae, "Invalid mode specified");
-					}
-					catch (NativeMethodException nme)
-					{
-						Log.Logger.Error(nme, "Failed to set mode");
-					}
+		private ProcessWatcher _watcher;
 
-					EnableControls = true;
-				});
+		private void Activate(DisplayMode m)
+		{
+			_savedDevice = SelectedDevice;
+			_savedMode = SelectedDevice.CurrentMode;
+			Log.Logger.Information("Saving current mode {mode}", _savedMode);
+
+			Log.Logger.Information("Setting mode {mode} on device {device}", m, SelectedDevice);
+			try
+			{
+				SelectedDevice.SetMode(m);
+				SelectedDeviceCurrentMode = SelectedDevice.CurrentMode;
+			}
+			catch (ArgumentException ae)
+			{
+				Log.Logger.Error(ae, "Invalid mode specified");
+			}
+			catch (NativeMethodException nme)
+			{
+				Log.Logger.Error(nme, "Failed to set mode");
+			}
+		}
+
+		private void Deactivate()
+		{
+			Log.Logger.Information("Restoring saved mode {mode} on device {device}", _savedMode, _savedDevice);
+			try
+			{
+				_savedDevice.SetMode(_savedMode);
+				SelectedDeviceCurrentMode = SelectedDevice.CurrentMode;
+			}
+			catch (ArgumentException ae)
+			{
+				Log.Logger.Error(ae, "Invalid mode specified");
+			}
+			catch (NativeMethodException nme)
+			{
+				Log.Logger.Error(nme, "Failed to set mode");
+			}
+
+			EnableControls = true;
+		}
+
+		public ICommand RestoreCommand => new CustomCommand(Deactivate);
 
 		private bool _enableControls = true;
 
