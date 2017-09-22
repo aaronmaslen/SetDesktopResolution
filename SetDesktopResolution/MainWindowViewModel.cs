@@ -30,9 +30,11 @@
 		{
 			PropertyChanged += DeviceSelectedHandler;
 
+			// Save log events
 			logObservable
 				.Do(e =>
 				{
+					// Copy on write - this runs on a separate thread to the UI
 					_logEntries = _logEntries.Concat(new[] { e }).ToList();
 					OnPropertyChanged(nameof(LogText));
 				})
@@ -44,12 +46,14 @@
 
 		public void Update()
 		{
+			// Save current device and mode
 			var device = SelectedDevice;
 			var mode = SelectedMode;
 			
 			Devices = new ObservableCollection<DisplayDevice>(
 				DisplayDevice.GetDisplayDevices().Where(d => d.Attached));
 
+			// Restore device and mode if they're still available
 			if (device != null && Devices.Contains(device))
 			{
 				SelectedDevice = device;
@@ -83,7 +87,7 @@
 			(sender, eventArgs) =>
 			{
 				if (eventArgs.PropertyName != nameof(SelectedDevice)) return;
-
+				
 				SelectedDeviceModes = new ObservableCollection<DisplayMode>(
 					SelectedDevice.Modes.Where(m => m.ScalingMode == DisplayMode.ScalingType.Default)
 					                    .Where(m => Properties.Settings.Default.IncludeInterlacedModes || !m.Interlaced)

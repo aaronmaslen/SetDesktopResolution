@@ -8,6 +8,9 @@
 
 	using SetDesktopResolution.Common.Extensions;
 
+	/// <summary>
+	/// Aaggregates multiple disposables
+	/// </summary>
 	public class DisposableAggregate : IDisposable
 	{
 		protected ICollection<IDisposable> Disposables { get; } = new List<IDisposable>();

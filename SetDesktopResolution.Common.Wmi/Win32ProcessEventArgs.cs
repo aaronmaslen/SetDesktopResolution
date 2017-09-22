@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SetDesktopResolution.Common.Wmi
+﻿namespace SetDesktopResolution.Common.Wmi
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using System.Threading.Tasks;
+
 	public class Win32ProcessEventArgs : EventArgs
 	{
 		public enum InstanceEventType
