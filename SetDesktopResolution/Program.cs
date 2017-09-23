@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SetDesktopResolution
+﻿namespace SetDesktopResolution
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using System.Threading.Tasks;
+
 	using Serilog;
 	using Serilog.Events;
 
@@ -30,8 +30,7 @@ namespace SetDesktopResolution
 			{
 				Wmi.ProcessEvent += (s, e) =>
 					{
-						if (e.EventType != Win32ProcessEventArgs.InstanceEventType.Modify)
-							Log.Logger.Verbose("{Name} ({PID}) - {Event}", e.Process.Name, e.Process.ProcessId, e.EventType);
+						Log.Logger.Verbose("{Name} ({PID}) - {Event}", e.Process.Name, e.Process.ProcessId, e.EventType);
 					};
 				
 				return new App(logObservable).Run();

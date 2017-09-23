@@ -31,13 +31,15 @@
 		/// <inheritdoc />
 		public void Execute(object parameter)
 		{
+			// Resharper likes to complain about this sometimes, but it compiles okay
 			if (this is CustomCommand c)
 			{
 				c.Execute();
 				return;
 			}
 
-			if (!(parameter is T o)) throw new ArgumentException("Invalid parameter type");
+			if (!(parameter is T o))
+				throw new ArgumentException("Invalid parameter type");
 
 			Execute(o);
 		}
